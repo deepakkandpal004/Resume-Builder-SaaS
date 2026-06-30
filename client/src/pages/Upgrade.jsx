@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Check, X, Zap, Sparkles, Lock, Tag,
-  BarChart2, Mail, MessageSquare, FileText, Infinity,
+  ArrowLeft, Check, X, Zap, Sparkles, Lock,
+  BarChart2, Mail, MessageSquare, FileText,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../configs/api";
-import { setPremium } from "../app/features/authSlice";
+import { login } from "../app/features/authSlice";
 
 // ── Plan data ─────────────────────────────────────────────────────────────
 
@@ -77,45 +77,111 @@ const Upgrade = () => {
   const { user, token } = useSelector((state) => state.auth);
   const isPremium  = user?.subscriptionTier === "premium";
 
-  const [promoCode, setPromoCode]   = useState("");
-  const [showPromo, setShowPromo]   = useState(false);
   const [loading, setLoading]       = useState(false);
+
+  const fetchUserData = async () => {
+    try {
+      const { data } = await api.get("/api/users/data", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (data.user) {
+        dispatch(login({ user: data.user, token }));
+      }
+    } catch (err) {
+      console.error("Failed to sync user data after checkout:", err);
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+    if (status === "success") {
+      toast.success("Thank you for upgrading! Your subscription is now active.");
+      fetchUserData();
+      navigate("/app/upgrade", { replace: true });
+    } else if (status === "cancel") {
+      toast.error("Upgrade checkout was cancelled.");
+      navigate("/app/upgrade", { replace: true });
+    }
+  }, []);
 
   const handleUpgrade = async () => {
     setLoading(true);
     try {
       const { data } = await api.post(
-        "/api/users/upgrade",
-        { promoCode: promoCode.trim() || undefined },
+        "/api/payments/create-checkout-session",
+        {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      dispatch(setPremium());
-      toast.success(data.message);
-      navigate("/app");
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error("Failed to generate checkout link. Please try again.");
+      }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Upgrade failed. Please try again.");
+      toast.error(error?.response?.data?.message || "Failed to initiate Stripe Checkout.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Already premium — show a thank-you state
+  const handleManageSubscription = async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.post(
+        "/api/payments/create-portal-session",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error("Failed to redirect to billing portal.");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to launch portal.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Already premium — show portal management option
   if (isPremium) {
     return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 mb-6">
+      <div className="mx-auto max-w-md px-4 py-20 text-center space-y-6">
+        <div className="inline-flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-500 mb-2">
           <Sparkles className="size-8 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-ink">You're on Premium</h1>
-        <p className="mt-2 text-sm text-muted">
-          You have unlimited access to all AI features. Enjoy!
+        <p className="text-sm text-muted leading-relaxed">
+          You have unlimited access to all AI features and resume templates.
         </p>
-        <Link
-          to="/app"
-          className="btn-brand mt-8 inline-flex items-center gap-2"
-        >
-          <ArrowLeft className="size-4" /> Back to dashboard
-        </Link>
+        
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={handleManageSubscription}
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 py-3.5 text-sm font-semibold text-white shadow-md transition-all hover:from-brand-500 hover:to-accent-500 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+          >
+            {loading ? (
+              <span className="flex items-center gap-2 justify-center">
+                <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Processing…
+              </span>
+            ) : (
+              <>
+                <Zap className="size-4 animate-pulse" />
+                Manage Subscription
+              </>
+            )}
+          </button>
+          <Link
+            to="/app"
+            className="btn-outline flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold border border-line bg-surface text-ink hover:bg-canvas active:scale-[0.98]"
+          >
+            <ArrowLeft className="size-4" /> Back to dashboard
+          </Link>
+        </div>
       </div>
     );
   }
@@ -185,41 +251,19 @@ const Upgrade = () => {
 
             {plan.highlight ? (
               <div className="space-y-3">
-                {/* Promo code toggle */}
-                <button
-                  type="button"
-                  onClick={() => setShowPromo((p) => !p)}
-                  className="flex items-center gap-2 text-xs text-brand-600 hover:underline"
-                >
-                  <Tag className="size-3.5" />
-                  {showPromo ? "Hide promo code" : "Have a promo code?"}
-                </button>
-
-                {showPromo && (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      placeholder="Enter code (e.g. LAUNCH2024)"
-                      className="flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 uppercase tracking-wider"
-                    />
-                  </div>
-                )}
-
                 <button
                   onClick={handleUpgrade}
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 py-3 text-sm font-semibold text-white shadow-md transition-all hover:from-brand-500 hover:to-accent-500 active:scale-[0.98] disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 py-3.5 text-sm font-semibold text-white shadow-md transition-all hover:from-brand-500 hover:to-accent-500 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
                 >
                   {loading ? (
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2 justify-center">
                       <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Processing…
+                      Redirecting to Stripe…
                     </span>
                   ) : (
                     <>
-                      <Zap className="size-4" />
+                      <Zap className="size-4 animate-bounce" />
                       {plan.cta}
                     </>
                   )}
@@ -231,7 +275,7 @@ const Upgrade = () => {
             ) : (
               <button
                 disabled
-                className="w-full rounded-xl border border-line py-3 text-sm font-medium text-muted cursor-default"
+                className="w-full rounded-xl border border-line py-3.5 text-sm font-medium text-muted cursor-default"
               >
                 {plan.cta}
               </button>
@@ -275,8 +319,7 @@ const Upgrade = () => {
 
       {/* Footer note */}
       <p className="mt-8 text-center text-xs text-muted">
-        Prices shown in INR. Premium is a manual activation — payment integration coming soon.
-        Use a promo code if you have one.
+        Prices shown in INR. Upgrades are securely handled by Stripe. Cancel at any time in the billing settings.
       </p>
     </div>
   );

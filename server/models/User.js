@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema({
     },
     resetPasswordToken:   { type: String,  default: undefined },
     resetPasswordExpires: { type: Date,    default: undefined },
+    stripeCustomerId:     { type: String,  default: null },
+    stripeSubscriptionId:  { type: String,  default: null },
 }, { timestamps: true });
 
 userSchema.methods.comparePassword = async function(password) {
