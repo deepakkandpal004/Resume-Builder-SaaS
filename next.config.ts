@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  serverExternalPackages: [
+    "firebase-admin",
+    "jwks-rsa",
+    "jose",
+  ],
 };
 
 export default nextConfig;
