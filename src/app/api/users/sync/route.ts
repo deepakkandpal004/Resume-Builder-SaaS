@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/config/db";
 import { protect } from "@/lib/middlewares/auth";
 import User from "@/lib/models/User";
-import Resume from "@/lib/models/Resume";
-import AtsScore from "@/lib/models/AtsScore";
 import logger from "@/lib/observability/logger";
 
 export async function POST(request: NextRequest) {
@@ -14,9 +12,11 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     const firebaseUid = authResult.userId;
-    const tokenEmail = (authResult.firebaseUser?.email || body.email || "").trim().toLowerCase();
+    const tokenEmail =
+      authResult.firebaseUser?.email?.trim().toLowerCase() || "";
     const name = body.name || authResult.firebaseUser?.name || authResult.firebaseUser?.displayName;
-    const emailVerified = authResult.firebaseUser?.email_verified === true || body.emailVerified === true;
+    const emailVerified =
+      authResult.firebaseUser?.email_verified === true;
 
     console.log("[API /api/users/sync] Syncing user:", { firebaseUid, tokenEmail, name, emailVerified });
 
