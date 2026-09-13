@@ -17,23 +17,28 @@ async function connectDB() {
   }
 
   if (!cached.promise) {
-    console.log("[MongoDB] Connecting to database 'resume-builder'...");
+    console.log("[MongoDB] Connecting to MongoDB...");
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "resume-builder",
       maxPoolSize: 10,
       minPoolSize: 2,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
     }).then((m) => {
-      console.log(`[MongoDB] Connected successfully! Host: ${m.connection.host}, Database: ${m.connection.name}`);
+      console.log("========== MONGODB DEBUG ==========");
+      console.log("Host:", m.connection.host);
+      console.log("Database:", m.connection.name);
+      console.log("DB databaseName:", m.connection.db?.databaseName);
+      console.log("===================================");
+
       return m;
     });
   }
 
   try {
     cached.conn = await cached.promise;
-  } catch (e: any) {
-    console.error("[MongoDB] Connection error:", e.message);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Unknown error";
+    console.error("[MongoDB] Connection error:", message);
     cached.promise = null;
     throw e;
   }

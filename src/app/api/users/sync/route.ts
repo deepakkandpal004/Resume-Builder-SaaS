@@ -22,7 +22,21 @@ export async function POST(request: NextRequest) {
 
     console.log("[API /api/users/sync] Syncing user:", { firebaseUid, tokenEmail, name, emailVerified });
 
+    console.log("[USER SYNC] Firebase identity:", {
+      firebaseUid,
+      tokenEmail,
+    });
+
+
     let user = await User.findOne({ firebaseUid });
+
+    console.log("[USER SYNC] User found by UID:", {
+      found: !!user,
+      userId: user?._id?.toString(),
+      email: user?.email,
+      firebaseUid: user?.firebaseUid,
+    });
+
 
     if (user) {
       user.name = name || user.name;
@@ -32,6 +46,13 @@ export async function POST(request: NextRequest) {
       console.log("[API /api/users/sync] Updated existing user in MongoDB:", user._id);
     } else {
       user = tokenEmail ? await User.findOne({ email: tokenEmail }) : null;
+
+      console.log("[USER SYNC] User found by email:", {
+          found: !!user,
+          userId: user?._id?.toString(),
+          email: user?.email,
+          firebaseUid: user?.firebaseUid,
+        });
 
       if (user) {
         user.firebaseUid = firebaseUid;
