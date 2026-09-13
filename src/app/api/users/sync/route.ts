@@ -4,6 +4,8 @@ import { protect } from "@/lib/middlewares/auth";
 import User from "@/lib/models/User";
 import logger from "@/lib/observability/logger";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
