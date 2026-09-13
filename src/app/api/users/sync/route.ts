@@ -51,7 +51,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ user });
   } catch (error: any) {
     console.error("[API /api/users/sync Error]:", error);
-    logger.error("syncUser failed:", error.message);
-    return NextResponse.json({ message: "Something went wrong syncing user profile" }, { status: 500 });
+    logger.error("syncUser failed: " + (error?.message || error));
+    return NextResponse.json(
+      {
+        message: "Something went wrong syncing user profile",
+        error: error?.message || "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }

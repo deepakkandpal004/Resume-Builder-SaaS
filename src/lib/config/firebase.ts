@@ -8,20 +8,43 @@ let authInstance: ReturnType<typeof getAuth> | undefined;
 
 function loadServiceAccount(): any {
   // 1. Check FIREBASE_SERVICE_ACCOUNT env var
-  const envVal = process.env.FIREBASE_SERVICE_ACCOUNT?.trim();
+  let envVal = process.env.FIREBASE_SERVICE_ACCOUNT?.trim();
   if (envVal) {
-    // Check if it's a direct JSON string
+    // Strip surrounding quotes if present (e.g. from Vercel env copy-paste)
+    if (
+      (envVal.startsWith('"') && envVal.endsWith('"')) ||
+      (envVal.startsWith("'") && envVal.endsWith("'"))
+    ) {
+      envVal = envVal.slice(1, -1).trim();
+    }
+
+    // Try parsing directly as JSON string
     if (envVal.startsWith("{")) {
       try {
         const parsed = JSON.parse(envVal);
         if (parsed.private_key) {
           parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
         }
-        console.log("[Firebase Admin] Loaded service account credentials from FIREBASE_SERVICE_ACCOUNT env string.");
+        console.log("[Firebase Admin] Loaded service account credentials from FIREBASE_SERVICE_ACCOUNT env JSON.");
         return parsed;
       } catch (err: any) {
-        console.error("[Firebase Admin] Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:", err.message);
+        console.error("[Firebase Admin] Failed to parse FIREBASE_SERVICE_ACCOUNT direct JSON:", err.message);
       }
+    }
+
+    // Try Base64 decoding if it's encoded
+    try {
+      const decoded = Buffer.from(envVal, "base64").toString("utf-8").trim();
+      if (decoded.startsWith("{")) {
+        const parsed = JSON.parse(decoded);
+        if (parsed.private_key) {
+          parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+        }
+        console.log("[Firebase Admin] Loaded service account credentials from base64 encoded FIREBASE_SERVICE_ACCOUNT.");
+        return parsed;
+      }
+    } catch {
+      // Not base64, continue
     }
 
     // Check if it's a file path
@@ -66,17 +89,30 @@ function loadServiceAccount(): any {
   }
 
   // 3. Check individual env variables
-  if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+  if (projectId && clientEmail && privateKey) {
+    privateKey = privateKey.trim();
+    if (
+      (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
+      (privateKey.startsWith("'") && privateKey.endsWith("'"))
+    ) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\n/g, "\n");
+
     console.log("[Firebase Admin] Loaded service account from individual environment variables.");
     return {
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      projectId,
+      clientEmail,
+      privateKey,
     };
   }
 
   throw new Error(
-    "[Firebase Admin] Missing Firebase Admin credentials. Please provide FIREBASE_SERVICE_ACCOUNT JSON or place serviceAccountKey.json in the project root."
+    "[Firebase Admin] Missing Firebase Admin credentials. Please provide FIREBASE_SERVICE_ACCOUNT JSON or set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY."
   );
 }
 
