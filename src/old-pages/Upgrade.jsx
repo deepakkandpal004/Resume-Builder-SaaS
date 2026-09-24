@@ -180,7 +180,7 @@ const Upgrade = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200 }}
-          className="mx-auto mb-6 flex size-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-2xl shadow-emerald-500/30"
+          className="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-500/20"
         >
           <Sparkles className="size-10 text-white" />
         </motion.div>
@@ -218,7 +218,7 @@ const Upgrade = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg"
+          className="mb-4 inline-flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
         >
           <Zap className="size-4" /> Unlock full access
         </motion.div>
@@ -235,19 +235,16 @@ const Upgrade = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`relative rounded-3xl border p-8 transition-all duration-300 ${
+            className={`relative rounded-xl border p-8 transition-all duration-300 ${
               plan.highlight
-                ? "border-emerald-400 shadow-2xl shadow-emerald-500/15 scale-[1.02] md:scale-105"
+                ? "border-emerald-400 shadow-md shadow-emerald-500/10"
                 : "border-line bg-surface"
             }`}
           >
             {plan.highlight && (
-              <>
-                <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30" />
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-1 text-xs font-bold text-white shadow-lg flex items-center gap-1.5">
-                  <Star className="size-3" /> Best Value
+              <span className="absolute -top-3 left-6 rounded-lg border border-emerald-500/20 bg-surface px-3 py-1 text-xs font-bold text-emerald-700 shadow-sm dark:text-emerald-300">
+                  Lifetime plan
                 </span>
-              </>
             )}
 
             <div className="relative mb-6">
@@ -285,7 +282,7 @@ const Upgrade = () => {
                   <button
                     onClick={handleUpgrade}
                     disabled={loading}
-                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition-all hover:from-emerald-500 hover:to-teal-500 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+                    className="group flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3.5 text-sm font-semibold text-white shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">

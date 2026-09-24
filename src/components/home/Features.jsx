@@ -80,13 +80,9 @@ const Features = () => {
         
         {/* Header Badge & Title */}
         <div className="flex flex-col items-center text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-200/50 bg-brand-50/70 px-4 py-1.5 text-xs font-bold text-brand-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-brand-400 shadow-xs shadow-brand-500/5">
-            <Lightbulb className="size-3.5 text-brand-500" />
-            <span>Core Capabilities</span>
-          </div>
           <Title
-            title="Everything you need to build a stronger resume"
-            description="Write faster, score higher, generate cover letters, prep for interviews — all in one place."
+            title="Tools for the parts of an application that take the most care"
+            description="Bring your resume, target role, writing, and final export into one focused workspace."
           />
         </div>
 
@@ -103,7 +99,7 @@ const Features = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
-                className={`premium-card group relative overflow-hidden rounded-[20px] p-7 cursor-default min-h-[200px] flex flex-col justify-between transition-all duration-250 ease-out border bg-surface/50 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-emerald-500/[0.04] ${
+                className={`premium-card group relative overflow-hidden rounded-[14px] p-7 cursor-default min-h-[200px] flex flex-col transition-all duration-250 ease-out border bg-surface/50 hover:border-emerald-500/35 ${
                   isFeatured 
                     ? "border-emerald-500/35 bg-surface shadow-xs" 
                     : "border-line/70 hover:border-emerald-500/35"
@@ -125,12 +121,6 @@ const Features = () => {
                       }`} />
                     </div>
 
-                    {/* Featured Badge */}
-                    {isFeatured && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-brand-500/10 text-brand-700 border border-brand-500/20 dark:bg-emerald-500/20 dark:text-brand-300">
-                        Most Popular
-                      </span>
-                    )}
                   </div>
 
                   {/* Title & Description */}
@@ -140,12 +130,6 @@ const Features = () => {
                   <p className="mt-3 text-xs leading-relaxed text-body line-clamp-2">
                     {f.desc}
                   </p>
-                </div>
-
-                {/* Arrow detail footer sliding in on hover */}
-                <div className="flex items-center justify-between mt-4 border-t border-line/30 pt-3">
-                  <span className="text-[10px] font-bold text-brand-600">Learn more</span>
-                  <ArrowRight className="size-3.5 text-brand-500 opacity-0 -translate-x-2.5 transition-all duration-250 ease-out group-hover:opacity-100 group-hover:translate-x-0" />
                 </div>
 
               </motion.div>

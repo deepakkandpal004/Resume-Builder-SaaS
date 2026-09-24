@@ -63,7 +63,7 @@ const Navbar = () => {
   return (
     <header className="fixed inset-x-0 top-0 z-40 px-4 pt-6 sm:px-6 md:px-10">
       <nav
-        className={`nav-glass-app mx-auto flex w-full max-w-7xl items-center justify-between rounded-full border px-7 py-3 shadow-md transition-all duration-500 ease-out ${
+        className={`nav-glass-app mx-auto flex w-full max-w-7xl items-center justify-between rounded-xl border px-7 py-3 shadow-md transition-all duration-500 ease-out ${
           scrolled ? "shadow-lg" : ""
         }`}
       >
@@ -81,10 +81,10 @@ const Navbar = () => {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex size-9 items-center justify-center rounded-full border border-line bg-surface/80 backdrop-blur-md shadow-sm transition-all duration-200 hover:border-emerald-500/30 active:scale-95"
+              className="flex size-9 items-center justify-center rounded-full border border-line bg-surface shadow-sm transition-all duration-200 hover:border-emerald-500/30 active:scale-95"
             >
               {isPremium ? (
-                <div className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-yellow-500 text-[10px] font-bold text-white">
+                <div className="flex size-7 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
                   {initial}
                 </div>
               ) : (

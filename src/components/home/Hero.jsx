@@ -2,7 +2,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import Link from "next/link";
-import { ArrowRight, Check, LayoutTemplate, Lock, Star, ShieldCheck, FileText, Clock, Lightbulb } from "lucide-react";
+import { ArrowRight, Check, Download, Eye, FileText, LayoutTemplate, Lightbulb, Search } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import ModernTemplate from "../templates/ModernTemplate";
 import { dummyResumeData } from "@/assets/assets";
@@ -10,10 +10,6 @@ import { dummyResumeData } from "@/assets/assets";
 const Hero = () => {
   const { user } = useSelector((state) => state.auth);
   const shouldReduceMotion = useReducedMotion();
-
-  // Static values for the mockup (no animation loop needed)
-  const jobTitleText = "Platform Engineer";
-  const atsScore = 96;
 
   const animVariants = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 15 },
@@ -60,7 +56,7 @@ const Hero = () => {
             className="mt-6 text-4xl font-extrabold leading-[1.1] text-ink sm:text-5xl md:text-6xl lg:text-7xl tracking-tight max-w-4xl"
             style={{ letterSpacing: "-0.04em" }}
           >
-            Create ATS-Friendly Resumes <span className="text-brand-600">That Get Interviews</span>
+            Build a resume that fits the role <span className="text-brand-600">you are applying for</span>
           </motion.h1>
 
           {/* Description */}
@@ -71,7 +67,7 @@ const Hero = () => {
             animate="visible"
             className="mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-body font-medium"
           >
-            Build professional templates optimized for ATS, refine every bullet point with smart rewriting, and export a polished PDF instantly.
+            Start with your experience, compare it with a job description, and make deliberate edits before exporting a clean PDF.
           </motion.p>
 
           {/* Trust Badges */}
@@ -83,11 +79,9 @@ const Hero = () => {
             className="mt-6 flex flex-wrap justify-center gap-2.5 max-w-3xl"
           >
             {[
-              { label: "ATS Optimized", icon: Check, color: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:text-emerald-400" },
-              { label: "Smart Rewriting", icon: Lightbulb, color: "text-indigo-600 bg-indigo-500/10 border-indigo-500/20 dark:text-indigo-400" },
-              { label: "Professional Templates", icon: LayoutTemplate, color: "text-blue-600 bg-blue-500/10 border-blue-500/20 dark:text-blue-400" },
-              { label: "Secure", icon: Lock, color: "text-purple-600 bg-purple-500/10 border-purple-500/20 dark:text-purple-400" },
-              { label: "Free Forever", icon: Star, color: "text-amber-600 bg-amber-500/10 border-amber-500/20 dark:text-amber-400" },
+              { label: "Clean layouts", icon: LayoutTemplate, color: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:text-emerald-400" },
+              { label: "Job-description review", icon: Check, color: "text-blue-600 bg-blue-500/10 border-blue-500/20 dark:text-blue-400" },
+              { label: "PDF export", icon: FileText, color: "text-slate-600 bg-slate-500/10 border-slate-500/20 dark:text-slate-400" },
             ].map((badge) => {
               const Icon = badge.icon;
               return (
@@ -180,14 +174,14 @@ const Hero = () => {
                         <div>
                           <div className="text-[8px] text-muted font-bold mb-1 uppercase tracking-wide">Full Name</div>
                           <div className="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[10px] text-ink font-semibold">
-                            Alex Smith
+                            Jordan Lee
                           </div>
                         </div>
                         
                         <div>
                           <div className="text-[8px] text-muted font-bold mb-1 uppercase tracking-wide">Job Title</div>
                           <div className="rounded-lg border border-brand-300 bg-surface px-2.5 py-1.5 text-[10px] text-brand-600 dark:text-brand-400 font-bold min-h-[28px] flex items-center">
-                            <span>{jobTitleText}</span>
+                            <span>Product Designer</span>
                           </div>
                         </div>
 
@@ -202,10 +196,10 @@ const Hero = () => {
                       <div className="rounded-xl border border-brand-500/30 bg-brand-500/5 p-2.5 text-left shadow-xs">
                         <div className="flex items-center gap-1.5 text-[8px] font-bold text-brand-600">
                           <span className="size-1.5 rounded-full bg-brand-500" />
-                          <span>Smart Suggestion</span>
+                          <span>Suggested edit</span>
                         </div>
                         <p className="mt-1 text-[7.5px] leading-normal text-muted font-medium">
-                          "Boosted load response by 40% with virtualized list matrices."
+                          "Added a clear outcome and a measurable result."
                         </p>
                       </div>
                     </div>
@@ -252,16 +246,12 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* ATS Score badge — static, no floating animation */}
+            {/* Keep the preview factual instead of presenting a guaranteed score. */}
             <div className="absolute -bottom-4 -left-4 rounded-xl border border-line bg-surface/90 backdrop-blur-md px-4 py-2.5 shadow-xl flex items-center gap-3.5 z-20">
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-emerald-500 font-extrabold text-sm">
-                  ATS Score: {atsScore}%
-                </span>
+                <span className="text-emerald-500 font-extrabold text-sm">Ready to review</span>
                 <span className="text-line">|</span>
-                <span className="text-ink font-bold text-[11px]">
-                  Excellent Match
-                </span>
+                <span className="text-ink font-bold text-[11px]">Your edits stay in your hands</span>
               </div>
             </div>
           </motion.div>
@@ -274,21 +264,21 @@ const Hero = () => {
             <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-teal-500/20 bg-teal-500/10 px-3.5 py-1 text-[10px] font-extrabold text-teal-600 dark:text-accent-400 uppercase tracking-wider select-none">
               <span>Built for Job Seekers</span>
             </div>
-            <h3 className="text-2xl font-bold text-ink tracking-tight sm:text-3xl">
-              Trusted by Job Seekers Everywhere
+              <h3 className="text-2xl font-bold text-ink tracking-tight sm:text-3xl">
+              A focused workspace for each application
             </h3>
             <p className="text-xs sm:text-sm text-muted max-w-md mt-2 leading-relaxed font-semibold">
-              See how an ATS-optimized resume improves your chances of landing interviews.
+              Keep the document, job description, and final export together while you make your edits.
             </p>
           </div>
 
           {/* Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-            {[
-              { value: "Instant", label: "PDF Downloads", desc: "Export your polished A4 resume directly to PDF with zero watermarks.", icon: FileText, accent: "#475569" },
-              { value: "ATS", label: "Optimized Formats", desc: "Clean structures explicitly designed to pass applicant tracking scanners.", icon: ShieldCheck, accent: "#6366f1" },
-              { value: "Smart", label: "Bullet Rewriter", desc: "Context-aware suggestions to strengthen your job descriptions.", icon: Lightbulb, accent: "#e11d48" },
-              { value: "One-time", label: "Payment", desc: "Unlock professional elements with a single purchase. Zero subscriptions.", icon: Clock, accent: "#d97706" }
+              {[
+              { value: "Live", label: "Resume preview", desc: "See layout changes as you edit each section.", icon: Eye, accent: "#475569" },
+              { value: "Role", label: "Job-description review", desc: "Compare your resume with the language used in a target role.", icon: Search, accent: "#0f766e" },
+              { value: "Clear", label: "Suggested edits", desc: "Review writing suggestions before deciding what to keep.", icon: Lightbulb, accent: "#be123c" },
+              { value: "PDF", label: "Ready to export", desc: "Download a clean document without a subscription requirement.", icon: Download, accent: "#b45309" }
             ].map((card, idx) => {
               const Icon = card.icon;
               return (

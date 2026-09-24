@@ -1,14 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Lightbulb, LayoutDashboard, BarChart3, ArrowRight, Check, Loader2 } from "lucide-react";
+import { FileText, Lightbulb, LayoutDashboard, BarChart3, ArrowRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const TABS = [
   { id: "builder", label: "Resume Builder", icon: FileText },
-  { id: "ai", label: "Smart Optimizer", icon: Lightbulb },
+  { id: "ai", label: "Writing Review", icon: Lightbulb },
   { id: "templates", label: "Templates", icon: LayoutDashboard },
-  { id: "ats", label: "ATS Score", icon: BarChart3 },
+  { id: "ats", label: "Role Review", icon: BarChart3 },
 ];
 
 const BrowserChrome = ({ children, savedTime, statusText }) => (
@@ -38,103 +38,12 @@ const BrowserChrome = ({ children, savedTime, statusText }) => (
 const ProductShowcase = () => {
   const scrollRef = useScrollReveal();
   const [activeTab, setActiveTab] = useState("builder");
-  const [isUserInteracting, setIsUserInteracting] = useState(false);
-
-  // Resume Builder state variables
-  const [typedRole, setTypedRole] = useState("Full Stack Dev");
-  const [typedCursor, setTypedCursor] = useState(true);
-
-  // AI Optimization state variables
-  const [aiStep, setAiStep] = useState(0); // 0: Weak, 1: Analyzing, 2: Improving, 3: Completed
 
   // Template State
   const [selectedTemplate, setSelectedTemplate] = useState("Modern");
 
-  // ATS score gauge loop values
-  const [atsScore, setAtsScore] = useState(82);
-
-  // Toast notifications trigger states
-  const [toastMessage, setToastMessage] = useState("");
-
-  // 1. Auto play loops (every 9.5s)
-  useEffect(() => {
-    if (isUserInteracting) return;
-
-    const mainTimer = setInterval(() => {
-      setActiveTab((prev) => {
-        const idx = TABS.findIndex((t) => t.id === prev);
-        const nextId = TABS[(idx + 1) % TABS.length].id;
-        return nextId;
-      });
-    }, 9500);
-
-    return () => clearInterval(mainTimer);
-  }, [isUserInteracting]);
-
-  // 2. Typing loop for Builder
-  useEffect(() => {
-    if (activeTab !== "builder") return;
-
-    // Reset initially
-    setTypedRole("Full Stack Dev");
-    setTypedCursor(true);
-
-    const step1 = setTimeout(() => setTypedRole("Full Stack Deve"), 1200);
-    const step2 = setTimeout(() => setTypedRole("Full Stack Devel"), 1500);
-    const step3 = setTimeout(() => setTypedRole("Full Stack Develop"), 1800);
-    const step4 = setTimeout(() => {
-      setTypedRole("Full Stack Developer");
-      setToastMessage("Autosaved ✓");
-    }, 2100);
-
-    // Blinking cursor simulation
-    const cursorInterval = setInterval(() => {
-      setTypedCursor((c) => !c);
-    }, 500);
-
-    return () => {
-      clearTimeout(step1);
-      clearTimeout(step2);
-      clearTimeout(step3);
-      clearTimeout(step4);
-      clearInterval(cursorInterval);
-    };
-  }, [activeTab]);
-
-  // 3. AI optimizer step loop
-  useEffect(() => {
-    if (activeTab !== "ai") return;
-
-    setAiStep(0);
-    setAtsScore(82);
-
-    const step1 = setTimeout(() => setAiStep(1), 2000); // Analyzing
-    const step2 = setTimeout(() => setAiStep(2), 4000); // Improving
-    const step3 = setTimeout(() => {
-      setAiStep(3); // Completed
-      setAtsScore(96);
-      setToastMessage("Rewrite finished!");
-    }, 6000);
-
-    return () => {
-      clearTimeout(step1);
-      clearTimeout(step2);
-      clearTimeout(step3);
-    };
-  }, [activeTab]);
-
-  // 4. Auto close toasts
-  useEffect(() => {
-    if (!toastMessage) return;
-    const t = setTimeout(() => setToastMessage(""), 2500);
-    return () => clearTimeout(t);
-  }, [toastMessage]);
-
-  // User click wrapper
   const handleTabClick = (tabId) => {
-    setIsUserInteracting(true);
     setActiveTab(tabId);
-    setToastMessage(`Switched to ${TABS.find((t) => t.id === tabId).label}`);
   };
 
   return (
@@ -210,8 +119,8 @@ const ProductShowcase = () => {
             {/* Main Browser Mockup Container */}
             <div className="rounded-2xl border border-line bg-surface/20 shadow-2xl">
               <BrowserChrome 
-                savedTime={activeTab === "builder" ? "2s ago" : "just now"}
-                statusText={activeTab === "builder" ? "Autosaved" : "Draft"}
+                savedTime="your changes"
+                statusText="Workspace preview"
               >
                 <div className="flex h-[380px] overflow-hidden bg-canvas">
                   
@@ -250,15 +159,14 @@ const ProductShowcase = () => {
                           <div className="space-y-1">
                             <label className="text-[9.5px] uppercase font-bold text-muted">Full Name</label>
                             <div className="h-9 rounded-lg border border-line bg-surface px-3 flex items-center text-xs text-ink font-semibold">
-                              Alex Smith
+                              Jordan Lee
                             </div>
                           </div>
 
                           <div className="space-y-1">
                             <label className="text-[9.5px] uppercase font-bold text-muted">Target Position</label>
                             <div className="h-9 rounded-lg border border-brand-500/30 bg-surface px-3 flex items-center text-xs text-brand-600 font-bold">
-                              <span>{typedRole}</span>
-                              {typedCursor && <span className="w-0.5 h-3.5 bg-brand-500 ml-0.5 animate-pulse" />}
+                              <span>Product Designer</span>
                             </div>
                           </div>
 
@@ -283,8 +191,8 @@ const ProductShowcase = () => {
                           <div className="flex items-center gap-3 p-3.5 rounded-xl border border-brand-500/25 bg-brand-500/[0.04]">
                             <Lightbulb className="size-5 text-brand-500" />
                             <div>
-                              <h4 className="text-xs font-bold text-ink">Smart Rewriter</h4>
-                              <p className="text-[10px] text-muted">Rewrites weak bullet points with stronger action verbs and metrics.</p>
+                              <h4 className="text-xs font-bold text-ink">Writing review</h4>
+                              <p className="text-[10px] text-muted">Review a suggested rewrite before applying it to your resume.</p>
                             </div>
                           </div>
 
@@ -299,15 +207,10 @@ const ProductShowcase = () => {
 
                             <div>
                               <span className="text-[8.5px] uppercase font-bold text-brand-600 bg-brand-500/10 px-2 py-0.5 rounded flex items-center gap-1.5 w-fit">
-                                {aiStep === 1 && <Loader2 className="size-2.5 animate-spin" />}
-                                <span>{aiStep === 0 ? "Pending Rewrite" : aiStep === 1 ? "Analyzing..." : aiStep === 2 ? "Improving Bullet..." : "Optimized Bullet ✓"}</span>
+                                <span>Suggested rewrite</span>
                               </span>
                               <p className="text-xs text-ink mt-2 font-bold leading-relaxed">
-                                {aiStep <= 1 ? (
-                                  <span className="text-muted/50 italic">Analyzing...</span>
-                                ) : (
-                                  <span>"Boosted database queries by 45% using indexed Redis keys."</span>
-                                )}
+                                <span>"Improved database query performance with indexed keys."</span>
                               </p>
                             </div>
                           </div>
@@ -362,19 +265,19 @@ const ProductShowcase = () => {
                         {/* Match metrics progress list */}
                         <div className="space-y-3">
                           {[
-                            { name: "Grammar Match", score: "100%" },
-                            { name: "Keyword density", score: "94%" },
-                            { name: "Content Readability", score: "91%" },
+                            { name: "Required terms", status: "Review" , width: "72%" },
+                            { name: "Relevant experience", status: "Review", width: "58%" },
+                            { name: "Readable structure", status: "Present", width: "86%" },
                           ].map((item, index) => (
                             <div key={item.name} className="space-y-1">
                               <div className="flex items-center justify-between text-[11px] font-bold text-ink">
                                 <span>{item.name}</span>
-                                <span>{item.score}</span>
+                                <span>{item.status}</span>
                               </div>
                               <div className="h-1.5 w-full bg-line rounded-full overflow-hidden">
                                 <motion.div
                                   initial={{ width: 0 }}
-                                  animate={{ width: item.score }}
+                                  animate={{ width: item.width }}
                                   transition={{ duration: 1.2, delay: index * 0.15 }}
                                   className="h-full bg-brand-500"
                                 />
@@ -385,7 +288,7 @@ const ProductShowcase = () => {
 
                         {/* Keyword tags pills mapping */}
                         <div className="pt-2">
-                          <span className="text-[10px] font-bold text-muted block mb-1.5">Parsed matching skills</span>
+                          <span className="text-[10px] font-bold text-muted block mb-1.5">Terms found in the draft</span>
                           <div className="flex flex-wrap gap-1">
                             {["React", "Node.js", "TypeScript", "Indexed DB", "AWS"].map((tag) => (
                               <span key={tag} className="px-2 py-0.5 text-[9.5px] font-bold bg-emerald-500/10 text-emerald-600 rounded">
@@ -403,21 +306,6 @@ const ProductShowcase = () => {
                 {/* Right Document A4 Live Preview Mockup */}
                 <div className="w-56 p-5 flex flex-col justify-center bg-line/20 relative">
                   
-                  {/* Floating Action Badge showing inside preview context */}
-                  <AnimatePresence>
-                    {toastMessage && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-lg border border-brand-500 bg-surface shadow-md text-[9.5px] font-bold text-brand-600 flex items-center gap-1.5"
-                      >
-                        <Check className="size-3 text-brand-500" />
-                        <span>{toastMessage}</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
                   <div className="text-[8px] font-bold uppercase tracking-wider text-muted mb-2 text-center">Live Preview</div>
 
                   {/* Document sheet */}
@@ -430,9 +318,9 @@ const ProductShowcase = () => {
                       
                       {/* Name header */}
                       <div className="space-y-1 text-center">
-                        <div className="text-[12px] font-extrabold tracking-tight text-slate-900 leading-none">Alex Smith</div>
+                        <div className="text-[12px] font-extrabold tracking-tight text-slate-900 leading-none">Jordan Lee</div>
                         <div className="text-[8px] font-bold text-brand-600 flex items-center justify-center gap-0.5">
-                          <span>{activeTab === "builder" ? typedRole : "Full Stack Developer"}</span>
+                          <span>Product Designer</span>
                         </div>
                       </div>
 
@@ -441,11 +329,7 @@ const ProductShowcase = () => {
                         <div className="h-0.5 w-full bg-slate-200" />
                         <div className="h-1 w-10 bg-slate-300 rounded-xs" />
                         <p className="text-[6.5px] text-slate-500 leading-relaxed font-semibold">
-                          {activeTab === "ai" && aiStep >= 2 ? (
-                            <span>"Boosted database queries by 45% using indexed Redis keys. Managed LCP optimization.</span>
-                          ) : (
-                            <span>Developed scalable web applications. Managed LCP parameters for modern SaaS dashboard templates.</span>
-                          )}
+                          <span>Improved the onboarding flow and documented reusable interface patterns.</span>
                         </p>
                       </div>
 
@@ -467,7 +351,7 @@ const ProductShowcase = () => {
                         <span className="text-[5.5px] font-bold text-slate-400">Page 1 of 1</span>
                         <div className="flex items-center gap-1 rounded bg-brand-500/10 px-1.5 py-0.5">
                           <span className="size-1 rounded-full bg-brand-500" />
-                          <span className="text-[6px] text-brand-600 font-bold">ATS Score: {atsScore}</span>
+                          <span className="text-[6px] text-brand-600 font-bold">Role review pending</span>
                         </div>
                       </div>
 

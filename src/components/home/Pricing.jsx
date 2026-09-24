@@ -111,7 +111,7 @@ const Pricing = () => {
             Start free. Upgrade once if you need more.
           </h2>
           <p className="mt-4 text-sm sm:text-base leading-relaxed text-body max-w-xl">
-            No subscription. No hidden fees. The free plan covers the essentials.
+            Use the core resume workflow for free. Pay once only when you need higher limits.
           </p>
         </div>
 
@@ -132,26 +132,10 @@ const Pricing = () => {
                 key={plan.name}
                 className={`relative flex flex-col h-full rounded-[20px] border transition-all duration-250 ease-out transform-gpu select-none outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:-translate-y-1.5 ${
                   isPro
-                    ? "border-brand-500 bg-surface shadow-md hover:border-brand-500 hover:shadow-lg hover:-translate-y-1.5 hover:scale-[1.03] order-1 md:order-2 z-10"
-                    : "border-line/60 bg-surface shadow-xs hover:border-brand-500/20 hover:shadow-lg hover:-translate-y-1.5 hover:scale-[1.005] order-2 md:order-1"
+                    ? "border-brand-500 bg-surface shadow-md order-1 md:order-2 z-10"
+                    : "border-line/60 bg-surface shadow-xs order-2 md:order-1"
                 }`}
               >
-                {/* Subtle radial green glow behind Pro card */}
-                {isPro && (
-                  <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.08),transparent_60%)] blur-2xl z-[-1]" />
-                )}
-
-                {/* Floating "Best value" badge */}
-                {isPro && (
-                  <motion.span
-                    animate={{ y: [0, -3, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border border-slate-300 bg-slate-800 px-4 py-1 text-xs font-bold text-white shadow-md backdrop-blur-md"
-                  >
-                    Best value
-                  </motion.span>
-                )}
-
                 {/* Card Header */}
                 <div className="p-8 pb-0">
                   <h3 className="text-xl font-bold text-ink">{plan.name}</h3>

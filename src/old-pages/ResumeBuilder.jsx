@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef, useCallback, memo, useLayoutEffect, Suspense, lazy } from "react";
+import { useEffect, useState, useRef, useCallback, memo, useLayoutEffect, Suspense, lazy } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,7 +28,6 @@ import {
   Loader2,
   Download,
   Eye,
-  Edit3,
   Pencil,
   Check,
   X,
@@ -40,7 +39,6 @@ import {
   AlertTriangle,
   Undo,
   Redo,
-  Heart,
   Maximize2,
   Minimize2,
   Keyboard,
@@ -766,25 +764,25 @@ const ResumeBuilder = () => {
             className="inline-flex shrink-0"
           >
             {autoSaveStatus === "saving" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/20 text-[10px] font-bold text-amber-700 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/40">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/20 text-[10px] font-bold text-amber-700 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/40">
                 <Loader2 className="size-3 animate-spin" />
                 <span>Saving...</span>
               </span>
             )}
             {autoSaveStatus === "saved" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/20 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/40">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/20 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/40">
                 <Check className="size-3" />
                 <span>Saved</span>
                 <span className="text-[9px] opacity-75 hidden sm:inline">• Updated just now</span>
               </span>
             )}
             {autoSaveStatus === "error" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-950/20 text-[10px] font-bold text-rose-700 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/40">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 dark:bg-rose-950/20 text-[10px] font-bold text-rose-700 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/40">
                 Save failed
               </span>
             )}
             {autoSaveStatus === "idle" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-zinc-900 text-[10px] font-bold text-muted border border-line">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 dark:bg-zinc-900 text-[10px] font-bold text-muted border border-line">
                 <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
                 <span>Unsaved changes</span>
               </span>
@@ -985,7 +983,7 @@ const ResumeBuilder = () => {
                       <button
                         key={section.id}
                         onClick={() => scrollToSection(idx)}
-                        className={"group flex w-full items-center gap-2.5 px-3 py-2.5 text-xs font-semibold transition-all duration-150 rounded-xl " +
+                        className={"group flex w-full items-center gap-2.5 px-3 py-2.5 text-xs font-semibold transition-all duration-150 rounded-lg " +
                           (isActive
                             ? "bg-brand-50/70 border-l-2 border-brand-600 pl-[11px] -ml-[1px] text-brand-700 dark:bg-brand-500/10 dark:border-brand-500 dark:text-brand-300 shadow-sm"
                             : "text-muted hover:bg-slate-50 dark:hover:bg-zinc-900/50 hover:text-ink")}
@@ -1061,13 +1059,22 @@ const ResumeBuilder = () => {
                 <h2 className="text-base font-semibold text-ink">{activeSection.name}</h2>
                 <p className="text-xs text-muted mt-0.5">Step {activeSectionIndex + 1} of {sections.length}</p>
               </div>
-              <button
-                onClick={() => { setShowQuickJump(true); setQuickJumpQuery(""); }}
-                className="hidden sm:flex items-center gap-1.5 rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-muted transition hover:bg-surface hover:text-ink"
-              >
-                <Search className="size-3" />
-                <kbd className="rounded border border-line bg-surface px-1 text-[9px]">Cmd+K</kbd>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsMobilePreview(true)}
+                  className="flex lg:hidden items-center gap-1.5 rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-muted transition hover:bg-surface hover:text-ink"
+                >
+                  <Eye className="size-3.5" />
+                  Preview
+                </button>
+                <button
+                  onClick={() => { setShowQuickJump(true); setQuickJumpQuery(""); }}
+                  className="hidden sm:flex items-center gap-1.5 rounded-lg border border-line bg-canvas px-2.5 py-1.5 text-xs text-muted transition hover:bg-surface hover:text-ink"
+                >
+                  <Search className="size-3" />
+                  <kbd className="rounded border border-line bg-surface px-1 text-[9px]">Cmd+K</kbd>
+                </button>
+              </div>
             </div>
 
             <div className="bg-surface rounded-xl border border-line shadow-sm overflow-hidden">
@@ -1206,10 +1213,7 @@ const ResumeBuilder = () => {
 
           {/* Preview scroll area */}
           <div className="flex-1 overflow-auto bg-slate-100/70 dark:bg-zinc-900/70" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            <div className="min-h-full" style={{
-              backgroundImage: "radial-gradient(var(--color-line) 1.5px, transparent 1.5px)",
-              backgroundSize: "20px 20px",
-            }}>
+            <div className="min-h-full bg-canvas">
               <div ref={previewContainerRef} className="w-full h-full flex items-start justify-center py-10 px-4">
 
                 {/*
@@ -1269,7 +1273,7 @@ const ResumeBuilder = () => {
               transition={{ type: "spring", damping: 28, stiffness: 300 }}
               className="fixed top-0 right-0 z-50 h-full w-[92vw] max-w-sm bg-canvas shadow-2xl flex flex-col lg:hidden"
             >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/80 backdrop-blur-sm shrink-0">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-surface shrink-0">
                 <h3 className="text-sm font-semibold text-ink">Live Preview</h3>
                 <div className="flex items-center gap-2">
                   <button
@@ -1410,7 +1414,7 @@ const ResumeBuilder = () => {
       )}
 
       {/* ── MOBILE BOTTOM ACTION BAR ──────────────────────────────────── */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-line bg-surface/95 backdrop-blur-md safe-area-inset-bottom">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-line bg-surface safe-area-inset-bottom">
         <div className="flex items-center justify-around px-2 py-2">
           <button
             onClick={saveResume}
@@ -1452,12 +1456,12 @@ const ResumeBuilder = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-80 rounded-2xl border border-line bg-surface p-4 shadow-2xl overflow-hidden"
+              className="w-80 rounded-xl border border-line bg-surface p-4 shadow-lg overflow-hidden"
             >
               <div className="flex items-center justify-between border-b border-line pb-2.5 mb-3">
                 <div className="flex items-center gap-2">
-                  <Heart className="size-4 text-rose-500 fill-rose-500 animate-pulse" />
-                  <span className="text-sm font-bold text-ink font-sans">Resume Score & Health</span>
+                  <CheckCircle2 className="size-4 text-brand-500" />
+                  <span className="text-sm font-bold text-ink font-sans">Resume checklist</span>
                 </div>
                 <button
                   onClick={() => setShowHealthPanel(false)}
@@ -1468,60 +1472,11 @@ const ResumeBuilder = () => {
               </div>
 
               <div className="space-y-4">
-                {/* Score progress metrics */}
-                <div className="space-y-3">
-                  {/* ATS Rating */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[11px] font-semibold text-body">ATS Suitability</span>
-                      <span className="text-[11px] font-bold text-ink">{completenessScore}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-300" style={{ width: `${completenessScore}%` }} />
-                    </div>
-                  </div>
+                <p className="text-xs leading-relaxed text-muted">
+                  A quick content check based on the information in this resume. Run the dedicated ATS review for job-specific analysis.
+                </p>
 
-                  {/* Grammar Rating */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[11px] font-semibold text-body">Grammar & Spell Check</span>
-                      <span className="text-[11px] font-bold text-ink">{resumeData.professional_summary ? 100 : 0}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-indigo-500 rounded-full transition-all duration-300" style={{ width: `${resumeData.professional_summary ? 100 : 0}%` }} />
-                    </div>
-                  </div>
-
-                  {/* Readability Rating */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[11px] font-semibold text-body">Readability Score</span>
-                      <span className="text-[11px] font-bold text-ink">{resumeData.professional_summary?.length > 100 ? 92 : 40}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-500 rounded-full transition-all duration-300" style={{ width: `${resumeData.professional_summary?.length > 100 ? 92 : 40}%` }} />
-                    </div>
-                  </div>
-
-                  {/* Keywords Rating */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[11px] font-semibold text-body">Industry Keywords</span>
-                      <span className={`text-[11px] font-bold ${resumeData.skills?.length >= 8 ? "text-emerald-500" : resumeData.skills?.length >= 4 ? "text-amber-500" : "text-rose-500"}`}>
-                        {resumeData.skills?.length >= 8 ? "Excellent" : resumeData.skills?.length >= 4 ? "Good" : "Needs Work"}
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-300 ${resumeData.skills?.length >= 8 ? "bg-emerald-500" : resumeData.skills?.length >= 4 ? "bg-amber-500" : "bg-rose-500"}`} 
-                        style={{ width: `${resumeData.skills?.length >= 8 ? 95 : resumeData.skills?.length >= 4 ? 65 : 30}%` }} 
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Checklist checks */}
-                <div className="space-y-2.5 pt-3 border-t border-line max-h-40 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                <div className="space-y-2.5 border-t border-line pt-3 max-h-56 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
                   {getHealthChecks().map((check) => {
                     const isPass = check.status === "pass";
                     const isWarning = check.status === "warning";
@@ -1555,10 +1510,10 @@ const ResumeBuilder = () => {
             <motion.button
               layoutId="health-panel-trigger"
               onClick={() => setShowHealthPanel(true)}
-              className="flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 shadow-lg hover:shadow-xl hover:bg-canvas transition-all duration-200 cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-line bg-surface px-4 py-2.5 shadow-sm hover:bg-canvas transition-all duration-200 cursor-pointer"
             >
-              <Heart className="size-4 text-rose-500 fill-rose-500" />
-              <span className="text-xs font-bold text-ink">Health Check</span>
+              <CheckCircle2 className="size-4 text-brand-500" />
+              <span className="text-xs font-bold text-ink">Checklist</span>
               <span className={`size-2 rounded-full ${completenessScore >= 80 ? "bg-emerald-500" : completenessScore >= 50 ? "bg-amber-500" : "bg-rose-500"}`} />
             </motion.button>
           )}

@@ -87,7 +87,7 @@ const ProfessionalSummary = ({data, onChange}) => {
         <button
           disabled={isGenerating || !data}
           onClick={generateSummary}
-          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50 shrink-0 shadow-sm active:scale-95 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50 shrink-0 shadow-sm active:scale-95 disabled:cursor-not-allowed"
         >
           {isGenerating ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
           <span>{isGenerating ? "Enhancing..." : "AI Enhance"}</span>

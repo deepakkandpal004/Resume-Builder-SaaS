@@ -259,7 +259,7 @@ const ProjectForm = ({ data, onChange }) => {
                           type="button"
                           onClick={() => enhanceDescriptionWithStyle(index, "normal")}
                           disabled={generatingIndex !== -1 || !project.description?.trim()}
-                          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50 active:scale-95 disabled:cursor-not-allowed shadow-sm"
+                          className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50 active:scale-95 disabled:cursor-not-allowed shadow-sm"
                         >
                           {generatingIndex === index ? (
                             <Loader2 className="size-3.5 animate-spin" />

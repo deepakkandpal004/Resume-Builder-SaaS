@@ -128,14 +128,14 @@ const SkillsForm = ({ data, onChange, profession }) => {
         <button
           onClick={suggestSkills}
           disabled={loading}
-          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-3.5 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm active:scale-95"
+          className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm active:scale-95"
         >
           {loading ? (
             <Loader2 className="size-3.5 animate-spin" />
           ) : (
             <Sparkles className="size-3.5" />
           )}
-          <span>{loading ? "Suggesting..." : "Suggest with AI"}</span>
+          <span>{loading ? "Reviewing..." : "Suggest skills"}</span>
         </button>
         {hasSuggestions && (
           <button
@@ -155,10 +155,10 @@ const SkillsForm = ({ data, onChange, profession }) => {
 
       {/* AI Suggestions panel */}
       {hasSuggestions && (
-        <div className="space-y-4 rounded-2xl border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-500/20 dark:bg-purple-500/5">
-          <p className="flex items-center gap-2 text-xs font-bold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
+        <div className="space-y-4 rounded-xl border border-line bg-surface p-4">
+          <p className="flex items-center gap-2 text-xs font-bold text-ink uppercase tracking-wider">
             <Sparkles className="size-3.5" />
-            Suggested Skills for &ldquo;{profession}&rdquo;
+            Skills to review for &ldquo;{profession}&rdquo;
           </p>
 
           {suggestions.technical?.length > 0 && (

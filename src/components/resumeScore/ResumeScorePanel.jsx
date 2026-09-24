@@ -90,7 +90,7 @@ const ResumeScorePanel = ({ resumeId }) => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-ink">Resume Score</h3>
-          <p className="text-sm text-muted">AI evaluates your resume quality across key dimensions</p>
+          <p className="text-sm text-muted">Review your resume across content, completeness, skills, and formatting</p>
         </div>
         <button
           onClick={handleScore}
@@ -155,7 +155,7 @@ const ResumeScorePanel = ({ resumeId }) => {
       {!scores && status !== "loading" && !error && (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line py-16 text-center">
           <Sparkles className="mb-3 size-10 text-muted" />
-          <p className="text-sm text-muted">Click "Score My Resume" to get AI-powered feedback</p>
+          <p className="text-sm text-muted">Run a review to see practical suggestions for this resume</p>
         </div>
       )}
     </div>

@@ -8,7 +8,6 @@ import {
   UploadCloud,
   UploadCloudIcon,
   XIcon,
-  Sparkles,
   Search,
   ArrowUpDown,
   ChevronDown,
@@ -253,18 +252,17 @@ const Dashboard = () => {
       {/* Top Segment: Welcome, Actions & Sidebar grid row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
         
-        {/* Left Column (Spans 2/3): Welcome Header, Stats & Quick Actions */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
+        {/* Welcome Header, Stats & Quick Actions */}
+        <div className="lg:col-span-3 flex flex-col gap-6">
           
           {/* Header & Stats Cards */}
           <div className="flex flex-col gap-5 text-left">
             <div>
-              <h1 className="text-2xl font-bold text-ink flex items-center gap-2">
-                <span>Welcome back, {user?.name || "there"}</span>
-                <span className="animate-wave origin-[70%_75%] inline-block">👋</span>
+              <h1 className="text-2xl font-bold text-ink">
+                Your resumes
               </h1>
               <p className="mt-1 text-sm text-muted">
-                Create a new resume or pick up where you left off.
+                Create a new version or continue editing an existing application.
               </p>
             </div>
 
@@ -310,7 +308,7 @@ const Dashboard = () => {
           <div className="grid gap-4 sm:grid-cols-2">
             <button
               onClick={() => { setShowCreate(true); setSelectedTemplate("classic"); }}
-              className="group flex items-center gap-4 rounded-2xl border border-dashed border-line bg-surface p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-500/40 hover:shadow-md hover:shadow-emerald-500/[0.04] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500/35 outline-none"
+              className="group flex items-center gap-4 rounded-xl border border-dashed border-line bg-surface p-5 text-left transition-all duration-200 hover:border-emerald-500/40 hover:shadow-md hover:shadow-emerald-500/[0.04] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500/35 outline-none"
             >
               <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:group-hover:bg-emerald-500/20">
                 <PlusIcon className="size-6" />
@@ -323,7 +321,7 @@ const Dashboard = () => {
 
             <button
               onClick={() => setShowUpload(true)}
-              className="group flex items-center gap-4 rounded-2xl border border-dashed border-line bg-surface p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-md hover:shadow-teal-500/[0.04] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500/35 outline-none"
+              className="group flex items-center gap-4 rounded-xl border border-dashed border-line bg-surface p-5 text-left transition-all duration-200 hover:border-teal-500/40 hover:shadow-md hover:shadow-teal-500/[0.04] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500/35 outline-none"
             >
               <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-colors group-hover:bg-teal-100 dark:bg-teal-500/10 dark:text-teal-300 dark:group-hover:bg-teal-500/20">
                 <UploadCloudIcon className="size-6" />
@@ -335,59 +333,6 @@ const Dashboard = () => {
             </button>
           </div>
 
-        </div>
-
-        {/* Right Column (Spans 1/3): ATS Insights & Resume Tips sidebar */}
-        <div className="lg:col-span-1 flex">
-          <div className="w-full rounded-2xl border border-line bg-surface/40 backdrop-blur-md p-5 flex flex-col justify-between shadow-xs text-left">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="size-4 text-emerald-500 animate-pulse" />
-                <h3 className="text-sm font-bold text-ink uppercase tracking-wider">ATS Insights & Tips</h3>
-              </div>
-              
-              {/* Best ATS gauge */}
-              <div className="mb-5 p-3 rounded-xl border border-line/65 bg-surface/50">
-                <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-muted font-bold">Best ATS Target</span>
-                  <span className="text-emerald-600 font-extrabold">{avgAts > 0 ? `${Math.max(avgAts, 80)}%` : "Ready"}</span>
-                </div>
-                <div className="w-full h-1.5 bg-line rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-emerald-500 rounded-full transition-all duration-500" 
-                    style={{ width: `${avgAts > 0 ? Math.max(avgAts, 80) : 0}%` }}
-                  />
-                </div>
-                <span className="block text-[10px] text-muted font-semibold mt-1.5 leading-normal">
-                  Resumes matching 80%+ scores have a 3x higher interview rate.
-                </span>
-              </div>
-
-              {/* Tips items */}
-              <ul className="space-y-3.5">
-                {[
-                  { text: "Keep layouts to a single page for max parser impact.", title: "Page Constraint" },
-                  { text: "Quantify metrics (e.g., 'Improved load speeds by 40%').", title: "Metrics Count" },
-                  { text: "Avoid complex multi-column structures or custom graphics.", title: "Clean Structure" },
-                ].map((tip, idx) => (
-                  <li key={idx} className="flex gap-2.5 text-left">
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded bg-emerald-500/10 text-emerald-600 text-[10px] font-extrabold mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <span className="block text-xs font-bold text-ink leading-tight">{tip.title}</span>
-                      <span className="block text-[10px] leading-normal text-muted mt-0.5 font-semibold">{tip.text}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mt-5 border-t border-line/45 pt-4 flex items-center justify-between text-[10px] font-extrabold text-muted">
-              <span>Need more templates?</span>
-              <a href="#templates" className="text-brand-600 hover:text-brand-500 hover:underline transition-colors">Browse layout list &rarr;</a>
-            </div>
-          </div>
         </div>
 
       </div>

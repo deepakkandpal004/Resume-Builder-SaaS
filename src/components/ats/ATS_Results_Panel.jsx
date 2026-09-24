@@ -449,7 +449,7 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
               className="flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700 shadow-sm"
             >
               <Sparkles className="size-3.5" />
-              Auto-Tailor Resume
+              Create tailored draft
             </button>
           </div>
         </div>
@@ -625,7 +625,7 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
             <div className="flex items-center justify-between border-b border-line px-6 py-4">
               <div className="flex items-center gap-2">
                 <Sparkles className="size-5 text-brand-500 animate-pulse" />
-                <h2 className="text-lg font-bold text-ink">AI Resume Tailoring Assistant</h2>
+                <h2 className="text-lg font-bold text-ink">Tailored draft review</h2>
               </div>
               <button 
                 onClick={() => setShowTailorModal(false)}

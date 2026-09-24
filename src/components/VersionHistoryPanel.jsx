@@ -2,11 +2,9 @@
 import { Clock, History, Loader2, RotateCcw, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
 import api from "@/lib/config/apiClient";
 
 const VersionHistoryPanel = ({ resumeId, onRestore, onClose }) => {
-  const { token } = useSelector((state) => state.auth);
   const [versions, setVersions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [restoring, setRestoring] = useState(null);
@@ -15,9 +13,7 @@ const VersionHistoryPanel = ({ resumeId, onRestore, onClose }) => {
     if (!resumeId) return;
     (async () => {
       try {
-        const { data } = await api.get(`/api/resumes/versions/${resumeId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await api.get(`/api/resumes/versions/${resumeId}`);
         setVersions(data.versions);
       } catch (err) {
         toast.error(err?.response?.data?.message || "Failed to load versions");
@@ -25,15 +21,14 @@ const VersionHistoryPanel = ({ resumeId, onRestore, onClose }) => {
         setLoading(false);
       }
     })();
-  }, [resumeId, token]);
+  }, [resumeId]);
 
   const handleRestore = async (versionId) => {
     setRestoring(versionId);
     try {
       const { data } = await api.post(
         `/api/resumes/restore/${resumeId}/${versionId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {}
       );
       onRestore(data.resume);
       toast.success("Version restored");

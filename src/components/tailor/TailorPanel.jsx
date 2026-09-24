@@ -287,14 +287,14 @@ const TailorPanel = ({ resumeId, onApplyTailored }) => {
             id="tailor-generate-btn"
             onClick={handleGenerate}
             disabled={isLoading}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-brand-600 to-accent-600 px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <Sparkles className="size-4" />
             )}
-            {isLoading ? "Tailoring your resume…" : "Tailor Resume"}
+            {isLoading ? "Preparing a tailored draft…" : "Create tailored draft"}
           </button>
         </>
       )}
@@ -332,7 +332,7 @@ const TailorPanel = ({ resumeId, onApplyTailored }) => {
                 className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-medium transition-all ${
                   applied
                     ? "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300 cursor-default"
-                    : "bg-gradient-to-r from-brand-600 to-accent-600 text-white hover:opacity-90"
+                    : "bg-brand-600 text-white hover:bg-brand-700"
                 }`}
               >
                 {applied ? (

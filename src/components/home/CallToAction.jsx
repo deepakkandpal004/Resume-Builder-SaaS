@@ -19,18 +19,18 @@ const CallToAction = () => {
 
           <div className="relative">
             <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm font-medium text-brand-600 dark:text-emerald-300 dark:border-white/20 dark:bg-white/10 backdrop-blur-sm">
-              <span>Ready to Start?</span>
+                <span>Start with the document you already have</span>
             </div>
 
             <h2
               className="mx-auto max-w-3xl text-4xl font-black text-ink sm:text-5xl lg:text-6xl leading-[1.1] dark:text-white"
               style={{ letterSpacing: "-0.03em" }}
             >
-              Create Your <span className="text-brand-600 font-black">ATS-Friendly Resume</span>
+              Make your next application easier to review
             </h2>
 
             <p className="mx-auto mt-5 max-w-md text-base sm:text-lg leading-relaxed text-body dark:text-white/60 font-semibold">
-              Build a professional resume in minutes. Free to start, no watermarks.
+              Import an existing resume or begin from a clean template, then make the changes that fit the role.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row w-full sm:w-auto">

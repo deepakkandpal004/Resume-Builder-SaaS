@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { FileText, Palette, Lightbulb, Share2, ArrowRight, Clock, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,29 +39,6 @@ const steps = [
 
 const HowItWorks = () => {
   const scrollRef = useScrollReveal();
-
-  // Interactive Demonstration loop states
-  const [demoProgress, setDemoProgress] = useState(0);
-  const [atsScore, setAtsScore] = useState(82);
-  const [activeStep, setActiveStep] = useState(0);
-
-  useEffect(() => {
-    // 1. Stagger active step highlight
-    const stepInterval = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 4);
-    }, 4500);
-
-    // 2. Loop stats demo
-    const progressInterval = setInterval(() => {
-      setDemoProgress((p) => (p === 0 ? 76 : 0));
-      setAtsScore((s) => (s === 82 ? 96 : 82));
-    }, 9000);
-
-    return () => {
-      clearInterval(stepInterval);
-      clearInterval(progressInterval);
-    };
-  }, []);
 
   return (
     <section id="how-it-works" className="relative overflow-hidden px-6 py-28 md:px-10">
@@ -107,36 +84,25 @@ const HowItWorks = () => {
                 <div>
                   <div className="flex items-center justify-between text-xs font-bold text-ink mb-1.5">
                     <span>Formatting Status</span>
-                    <span>{demoProgress === 0 ? "Initializing..." : `${demoProgress}%`}</span>
+                    <span>Live preview</span>
                   </div>
                   <div className="h-2 w-full bg-line rounded-full overflow-hidden">
-                    <motion.div
-                      animate={{ width: demoProgress === 0 ? "20%" : `${demoProgress}%` }}
-                      transition={{ duration: 1.8, ease: "easeInOut" }}
-                      className="h-full bg-emerald-500"
-                    />
+                    <div className="h-full w-3/4 bg-emerald-500" />
                   </div>
                 </div>
 
-                {/* Live AI Optimization bullet check */}
+                {/* Job-description comparison */}
                 <div className="p-3.5 rounded-xl border border-line/65 bg-canvas/30 space-y-2 text-left">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-bold text-brand-600 flex items-center gap-1.5">
-                      <span className="size-1.5 rounded-full bg-brand-500 animate-ping" />
-                      Smart Suggestion
+                      <span className="size-1.5 rounded-full bg-brand-500" />
+                      Job-description review
                     </span>
-                    <span className="text-[9px] text-muted font-bold">Step 3 of 4</span>
+                    <span className="text-[9px] text-muted font-bold">Review before applying</span>
                   </div>
-                  
-                  {/* Dynamic bullet text toggle */}
+
                   <div className="text-[11px] leading-relaxed text-ink font-semibold">
-                    {demoProgress === 0 ? (
-                      <span className="text-muted/80">"I helped speed up database queries."</span>
-                    ) : (
-                      <span className="text-ink flex items-center gap-1">
-                        "Boosted database queries by 45% using indexed Redis keys."
-                      </span>
-                    )}
+                    <span className="text-ink">Compare your experience with the language used in the role.</span>
                   </div>
                 </div>
 
@@ -146,23 +112,18 @@ const HowItWorks = () => {
                   {/* ATS Score card */}
                   <div className="p-3.5 rounded-xl border border-line/65 bg-canvas/30 text-center flex flex-col justify-center">
                     <span className="text-[9px] font-bold text-muted uppercase">ATS Score</span>
-                    <motion.span 
-                      animate={{ scale: atsScore === 96 ? [1, 1.08, 1] : 1 }}
-                      className="text-2xl font-extrabold text-brand-600 mt-1"
-                    >
-                      {atsScore}%
-                    </motion.span>
+                    <span className="text-2xl font-extrabold text-brand-600 mt-1">Review</span>
                     <span className="text-[8.5px] font-bold text-ink mt-0.5">
-                      {atsScore === 96 ? "Excellent Match" : "Keywords low"}
+                      See what needs attention
                     </span>
                   </div>
 
                   {/* Checklist indicators */}
                   <div className="space-y-1.5 justify-center flex flex-col text-xs font-semibold text-body">
                     {[
-                      { label: "Grammar fixed", ok: demoProgress > 0 },
-                      { label: "Keywords match", ok: demoProgress > 0 },
-                      { label: "PDF Download ready", ok: demoProgress > 0 }
+                      { label: "Experience added", ok: true },
+                      { label: "Role compared", ok: true },
+                      { label: "PDF export available", ok: true }
                     ].map((item, idx) => (
                       <div key={idx} className="flex items-center gap-2">
                         <span className={`size-4 rounded-full flex items-center justify-center text-[9px] ${
@@ -184,8 +145,8 @@ const HowItWorks = () => {
 
             {/* Static assurance footer */}
             <div className="mt-8 text-xs font-bold text-muted flex items-center gap-2 border-t border-line/45 pt-4">
-              <span className="size-1.5 rounded-full bg-brand-500 animate-pulse" />
-              <span>Includes automatic parsing checks for compliance.</span>
+              <span className="size-1.5 rounded-full bg-brand-500" />
+              <span>Import an existing PDF or start with a blank resume.</span>
             </div>
 
           </div>
@@ -199,7 +160,6 @@ const HowItWorks = () => {
             <div className="space-y-4">
               {steps.map((step, index) => {
                 const Icon = step.icon;
-                const isActive = activeStep === index;
                 return (
                   <motion.div
                     key={step.title}
@@ -207,11 +167,7 @@ const HowItWorks = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-60px" }}
                     transition={{ duration: 0.5, delay: index * 0.12 }}
-                    className={`relative rounded-[22px] border p-5 md:p-6 transition-all duration-300 group cursor-default ${
-                      isActive 
-                        ? "border-brand-500/30 bg-brand-500/5 shadow-md" 
-                        : "border-line bg-surface/30 hover:border-brand-500/20"
-                    }`}
+                    className="relative rounded-[22px] border border-line bg-surface/30 p-5 md:p-6 transition-all duration-300 group cursor-default hover:border-brand-500/20"
                   >
                     <div className="flex items-start gap-4 md:gap-5">
                       
@@ -219,7 +175,7 @@ const HowItWorks = () => {
                       <div
                         className={`flex size-11 shrink-0 items-center justify-center rounded-xl text-white shadow-md transition-transform duration-300 group-hover:scale-105 ${step.color}`}
                       >
-                        <Icon className="size-5 animate-pulse-soft" />
+                        <Icon className="size-5" />
                       </div>
 
                       <div className="flex-1">

@@ -39,6 +39,7 @@
   --radius-xl:  0.875rem;
   --radius-2xl: 1.25rem;
   --radius-3xl: 1.75rem;
+  --radius-control: 0.625rem;
 }
 
 .dark {
@@ -116,21 +117,21 @@ body::-webkit-scrollbar {
 
 /* ── Glassmorphism ────────────────────────────────────────────── */
 .glass {
-  background: color-mix(in srgb, var(--color-canvas) 75%, transparent);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: color-mix(in srgb, var(--color-canvas) 88%, transparent);
+  backdrop-filter: blur(12px) saturate(1.05);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05);
   border-bottom: 1px solid var(--color-line);
 }
 
 .glass-card {
-  background: color-mix(in srgb, var(--color-surface) 30%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--color-line);
 }
 
 .glass-card:hover {
-  background: color-mix(in srgb, var(--color-surface) 40%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 86%, transparent);
   border-color: var(--color-brand-400);
 }
 
@@ -144,22 +145,23 @@ body::-webkit-scrollbar {
 
 /* ── Nav-specific glass — theme-synced variant (dashboard/home) ── */
 .nav-glass-app {
-  background: rgba(255, 255, 255, 0.70);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px) saturate(1.05);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
+  border: 1px solid rgba(15, 23, 42, 0.10);
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.02),
-    0 8px 32px rgba(15, 23, 42, 0.06);
+    0 6px 18px rgba(15, 23, 42, 0.05);
 }
 
 .dark .nav-glass-app {
-  background: rgba(15, 23, 42, 0.50);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px) saturate(1.05);
+  -webkit-backdrop-filter: blur(8px) saturate(1.05);
   border: 1px solid rgba(255, 255, 255, 0.09);
   box-shadow: 
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 10px 40px -10px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(16, 185, 129, 0.03);
+    0 6px 18px rgba(0, 0, 0, 0.28);
 }
 
 /* ── Ghost CTA (Login) ────────────────────────────────────────── */
@@ -263,11 +265,11 @@ body::-webkit-scrollbar {
 
 /* ── Button styles ────────────────────────────────────────────── */
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-8 py-3.5 font-semibold text-white transition-all duration-200 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25 active:scale-[0.97] hover:-translate-y-0.5;
+  @apply inline-flex items-center justify-center gap-2 rounded-[0.625rem] bg-emerald-600 px-8 py-3.5 font-semibold text-white transition-all duration-200 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/25 active:scale-[0.97] hover:-translate-y-0.5;
 }
 
 .btn-outline {
-  @apply inline-flex items-center justify-center gap-2 rounded-full border border-line px-8 py-3.5 font-semibold text-body transition-all duration-200 hover:border-emerald-500/30 hover:text-ink active:scale-[0.97] backdrop-blur-sm;
+  @apply inline-flex items-center justify-center gap-2 rounded-[0.625rem] border border-line px-8 py-3.5 font-semibold text-body transition-all duration-200 hover:border-emerald-500/30 hover:text-ink active:scale-[0.97];
 }
 
 /* ── Counter ──────────────────────────────────────────────────── */
@@ -277,7 +279,7 @@ body::-webkit-scrollbar {
 
 /* ── Legacy button (used across app pages) ────────────────────── */
 .btn-brand {
-  @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-2.5 text-white font-semibold transition-all duration-200 hover:bg-brand-700 hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.97];
+  @apply inline-flex items-center justify-center gap-2 rounded-[0.625rem] bg-brand-600 px-6 py-2.5 text-white font-semibold transition-all duration-200 hover:bg-brand-700 hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.97];
 }
 
 /* ── Premium inputs & forms ───────────────────────────────────── */
@@ -345,7 +347,7 @@ body::-webkit-scrollbar {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  border-radius: 9999px;
+  border-radius: var(--radius-control);
   background-color: color-mix(in srgb, var(--color-brand-50) 65%, transparent);
   padding: 0.375rem 0.75rem;
   font-size: 0.75rem;

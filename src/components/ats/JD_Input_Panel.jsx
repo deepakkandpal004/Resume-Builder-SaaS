@@ -192,7 +192,7 @@ const JD_Input_Panel = ({ resumeId, onScanComplete }) => {
           type="button"
           onClick={handleAnalyze}
           disabled={isLoading}
-          className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-brand-600 to-accent-600 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={isLoading ? 'Analyzing resume' : 'Analyze resume'}
         >
           {isLoading ? (
