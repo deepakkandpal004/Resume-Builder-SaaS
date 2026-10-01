@@ -130,6 +130,15 @@ const Navbar = () => {
                 </Link>
 
                 <Link
+                  href="/app/matcher"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-muted transition hover:bg-line/10"
+                >
+                  <Sparkles className="size-3.5" />
+                  Resume matcher
+                </Link>
+
+                <Link
                   href="/"
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-xs text-muted transition hover:bg-line/10"
