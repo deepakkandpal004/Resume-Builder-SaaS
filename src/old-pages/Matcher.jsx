@@ -50,7 +50,9 @@ const Matcher = () => {
         jobText: isUrl ? "" : input,
         jobUrl: isUrl ? input : "",
       });
-      setResult({ ...data, jdText: input });
+      // Prefer the normalized JD text the server actually ranked against —
+      // for link-only input this is the fetched page text, not the URL.
+      setResult({ ...data, jdText: data.jdText && data.jdText.length >= 50 ? data.jdText : input });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Could not match resumes");
     } finally {

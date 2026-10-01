@@ -6,6 +6,7 @@ import Resume from "@/lib/models/Resume";
 import { getMongoUserId } from "@/lib/utils/userHelper";
 import { checkQuota, refundQuotaOnError } from "@/lib/middlewares/quota";
 import { buildResumeText } from "@/lib/services/atsService";
+import { safeFetchText } from "@/lib/utils/safeFetch";
 
 const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 const MAX_RESUMES = 10;
@@ -25,41 +26,23 @@ const extractJson = (text: string): any | null => {
 const isHttpUrl = (u: unknown): u is string =>
   typeof u === "string" && /^https?:\/\/[^\s<>"')]+$/i.test(u.trim());
 
-// Fetch a job link and pull readable text so the AI can match against it.
+// Strip a fetched job page down to readable text for the AI to match against.
 // Best-effort: JS-heavy pages (Naukri) and login-walled pages (LinkedIn)
 // may return only partial text.
-const fetchPageText = async (url: string): Promise<string | null> => {
-  try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(url.trim(), {
-      signal: ctrl.signal,
-      redirect: "follow",
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Accept: "text/html",
-      },
-    });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const html = await res.text();
-    const text = html
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&quot;/g, '"')
-      .replace(/\s+/g, " ")
-      .trim();
-    return text.length >= 200 ? text.slice(0, 8000) : null;
-  } catch {
-    return null;
-  }
+const htmlToText = (html: string): string | null => {
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length >= 200 ? text.slice(0, 8000) : null;
 };
 
 const clampScore = (v: unknown): number => {
@@ -99,6 +82,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    if (text && text.length < 50 && !url) {
+      return NextResponse.json(
+        { message: "Paste a longer job description (at least 50 characters) or a job link." },
+        { status: 400 }
+      );
+    }
 
     const quotaResult = await checkQuota(request, authResult.userId, "match", 10);
     if (quotaResult.error) {
@@ -107,6 +96,7 @@ export async function POST(request: NextRequest) {
 
     const userId = await getMongoUserId(authResult.userId);
     if (!userId) {
+      await refundQuotaOnError(authResult.userId, "match");
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -114,7 +104,8 @@ export async function POST(request: NextRequest) {
     let jdText = text.length >= 50 ? text : "";
     let usedUrl = "";
     if (!jdText && url) {
-      const pageText = await fetchPageText(url);
+      const html = await safeFetchText(url.trim());
+      const pageText = html ? htmlToText(html) : null;
       if (!pageText) {
         await refundQuotaOnError(authResult.userId, "match");
         return NextResponse.json(
@@ -248,6 +239,9 @@ Include every resume id exactly once, best first. Never invent skills the resume
       company: typeof parsed.company === "string" ? parsed.company.slice(0, 120) : "",
       role: typeof parsed.role === "string" ? parsed.role.slice(0, 120) : "",
       jobUrl: usedUrl,
+      // Normalized JD text actually used for ranking — the client reuses this
+      // for "tailor in builder" so link-only input tailors real content, not the URL.
+      jdText: jdText.slice(0, 10000),
       rankings,
     });
   } catch (error) {

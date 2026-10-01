@@ -3,6 +3,7 @@ import connectDB from "@/lib/config/db";
 import { protect } from "@/lib/middlewares/auth";
 import getAI from "@/lib/config/ai";
 import { checkQuota, refundQuotaOnError } from "@/lib/middlewares/quota";
+import { safeFetchText } from "@/lib/utils/safeFetch";
 
 const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
@@ -47,22 +48,11 @@ const pickMeta = (html: string, re: RegExp): string => {
 
 // Fetch a pasted job link and pull its title/meta description so the AI
 // has something to extract from when the user pastes only a URL.
+// Uses the SSRF-guarded fetch shared with the resume matcher.
 const fetchPageSummary = async (url: string): Promise<string | null> => {
+  const html = await safeFetchText(url);
+  if (!html) return null;
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      redirect: "follow",
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Accept: "text/html",
-      },
-    });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const html = await res.text();
     const title = pickMeta(html, /<title[^>]*>([^<]*)<\/title>/i);
     const ogTitle = pickMeta(html, /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)/i);
     const desc = pickMeta(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i);
@@ -87,11 +77,7 @@ export async function POST(request: NextRequest) {
     const authResult = await protect(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const quotaResult = await checkQuota(request, authResult.userId, "extract", 30);
-    if (quotaResult.error) {
-      return NextResponse.json({ message: quotaResult.message }, { status: quotaResult.status });
-    }
-
+    // Validate input before claiming quota so bad requests don't burn it.
     const { text } = await request.json();
     if (typeof text !== "string" || text.trim().length < 10) {
       return NextResponse.json(
@@ -104,6 +90,11 @@ export async function POST(request: NextRequest) {
         { message: "Pasted text is too long (max 5,000 characters)." },
         { status: 400 }
       );
+    }
+
+    const quotaResult = await checkQuota(request, authResult.userId, "extract", 30);
+    if (quotaResult.error) {
+      return NextResponse.json({ message: quotaResult.message }, { status: quotaResult.status });
     }
 
     const today = new Date().toISOString().slice(0, 10);
