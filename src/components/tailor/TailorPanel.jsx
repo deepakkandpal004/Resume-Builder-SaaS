@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {
@@ -173,6 +173,19 @@ const TailorPanel = ({ resumeId, onApplyTailored }) => {
 
   const [jobDescription, setJobDescription] = useState("");
   const [validationError, setValidationError] = useState("");
+
+  // Prefill the JD when arriving from the resume matcher (? via sessionStorage)
+  useEffect(() => {
+    try {
+      const prefill = sessionStorage.getItem("cf_prefill_jd");
+      if (prefill) {
+        setJobDescription(prefill.slice(0, MAX_JD_LENGTH));
+        sessionStorage.removeItem("cf_prefill_jd");
+      }
+    } catch {
+      // storage unavailable — leave the field empty
+    }
+  }, []);
 
   const isLoading = status === "loading";
   const hasResults = !!tailored;

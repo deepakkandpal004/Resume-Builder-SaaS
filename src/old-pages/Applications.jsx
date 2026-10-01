@@ -161,11 +161,27 @@ const Applications = () => {
     }
   }, [user, loading]);
 
-  // Pre-select resume when coming from a dashboard resume card (?resumeId=...)
+  // Pre-fill the create modal from URL params — dashboard resume cards
+  // (?resumeId=...) or the resume matcher (?resumeId=&company=&role=&jobUrl=&source=)
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("resumeId");
-    if (q) {
-      setForm((f) => ({ ...f, resumeId: q }));
+    const params = new URLSearchParams(window.location.search);
+    const resumeId = params.get("resumeId") || "";
+    const company = params.get("company") || "";
+    const role = params.get("role") || "";
+    const jobUrl = params.get("jobUrl") || "";
+    const rawSource = (params.get("source") || "").toLowerCase();
+    const source = ["naukri", "linkedin", "referral", "company-site", "other"].includes(rawSource)
+      ? rawSource
+      : "naukri";
+    if (resumeId || company || role) {
+      setForm((f) => ({
+        ...f,
+        resumeId,
+        company: company.slice(0, 120),
+        role: role.slice(0, 120),
+        jobUrl: jobUrl.slice(0, 500),
+        source,
+      }));
       setPasteText("");
       setAiFilled(false);
       setShowModal(true);
