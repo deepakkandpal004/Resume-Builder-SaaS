@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { logout } from "@/lib/store/features/authSlice";
-import { LogOut, Sparkles, Zap, Settings, BadgeCheck } from "lucide-react";
+import { LogOut, Sparkles, Zap, Settings, BadgeCheck, Briefcase } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
 import { signOut } from "firebase/auth";
@@ -119,6 +119,15 @@ const Navbar = () => {
                     <span className="font-medium">Upgrade to Premium</span>
                   </Link>
                 )}
+
+                <Link
+                  href="/app/applications"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-muted transition hover:bg-line/10"
+                >
+                  <Briefcase className="size-3.5" />
+                  Applications
+                </Link>
 
                 <Link
                   href="/"
