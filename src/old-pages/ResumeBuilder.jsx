@@ -711,6 +711,20 @@ const ResumeBuilder = () => {
 
   const activeSection = sections[activeSectionIndex];
 
+  // Auto-open the "Tailor to JD" tab when arriving from the resume matcher
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("cf_open_tailor")) {
+        sessionStorage.removeItem("cf_open_tailor");
+        const tailorIdx = sections.findIndex((s) => s.id === "tailor");
+        if (tailorIdx !== -1) scrollToSection(tailorIdx);
+      }
+    } catch {
+      // storage unavailable — stay on the default section
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const sectionGroups = [
     { name: "Content",  sections: sections.slice(0, 8)  },
     { name: "Settings", sections: sections.slice(8, 10) },

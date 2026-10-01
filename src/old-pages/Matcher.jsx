@@ -63,6 +63,8 @@ const Matcher = () => {
   const tailorInBuilder = (resumeId) => {
     try {
       sessionStorage.setItem("cf_prefill_jd", result?.jdText || "");
+      // Tell the builder to open the "Tailor to JD" tab on arrival
+      sessionStorage.setItem("cf_open_tailor", "1");
     } catch {
       // storage unavailable — builder will just open without a prefilled JD
     }

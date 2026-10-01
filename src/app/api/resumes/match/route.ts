@@ -195,6 +195,8 @@ Include every resume id exactly once, best first. Never invent skills the resume
     } catch (err) {
       await refundQuotaOnError(authResult.userId, "match");
       const msg = (err as Error)?.message || "";
+      // Log the real cause server-side (no secrets in this message).
+      console.error("[match] AI call failed:", msg.slice(0, 500));
       if (msg.includes("429") || msg.includes("quota") || msg.includes("RESOURCE_EXHAUSTED")) {
         return NextResponse.json(
           { message: "AI service is busy. Please try again in a moment." },
