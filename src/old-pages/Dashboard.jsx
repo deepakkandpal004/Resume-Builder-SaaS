@@ -18,6 +18,7 @@ import {
   Award,
   Layout,
   Download,
+  Briefcase,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -592,6 +593,7 @@ const Dashboard = () => {
                                 >
                                   {[
                                     { label: "Edit Resume", icon: PencilIcon, color: "hover:text-emerald-600", action: () => router.push(`/app/builder/${r._id}`) },
+                                    { label: "Track Application", icon: Briefcase, color: "hover:text-emerald-600", action: () => router.push(`/app/applications?resumeId=${r._id}`) },
                                     { label: "Duplicate", icon: Copy, color: "hover:text-teal-600", action: () => duplicateResume(r._id) },
                                     { label: "Rename", icon: FileTextIcon, color: "hover:text-purple-600", action: () => { setEditResumeId(r._id); setTitle(r.title); } },
                                     { label: "Download PDF", icon: Download, color: "hover:text-blue-600", action: () => router.push(`/view/${r._id}`) },
@@ -696,6 +698,7 @@ const Dashboard = () => {
                                 >
                                   {[
                                     { label: "Edit Resume", icon: PencilIcon, color: "hover:text-emerald-600", action: () => router.push(`/app/builder/${r._id}`) },
+                                    { label: "Track Application", icon: Briefcase, color: "hover:text-emerald-600", action: () => router.push(`/app/applications?resumeId=${r._id}`) },
                                     { label: "Duplicate", icon: Copy, color: "hover:text-teal-600", action: () => duplicateResume(r._id) },
                                     { label: "Rename", icon: FileTextIcon, color: "hover:text-purple-600", action: () => { setEditResumeId(r._id); setTitle(r.title); } },
                                     { label: "Download PDF", icon: Download, color: "hover:text-blue-600", action: () => router.push(`/view/${r._id}`) },
