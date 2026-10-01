@@ -72,6 +72,40 @@ const Navbar = () => {
           <Logo size="md" />
         </Link>
 
+        {/* Center nav */}
+        <div className="hidden items-center gap-1 md:flex">
+          <Link
+            href="/app"
+            className={`rounded-lg px-3 py-1.5 text-sm transition ${
+              pathname === "/app"
+                ? "bg-line/60 font-medium text-ink"
+                : "text-muted hover:text-ink"
+            }`}
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/app/applications"
+            className={`rounded-lg px-3 py-1.5 text-sm transition ${
+              pathname.startsWith("/app/applications")
+                ? "bg-line/60 font-medium text-ink"
+                : "text-muted hover:text-ink"
+            }`}
+          >
+            Applications
+          </Link>
+          <Link
+            href="/app/matcher"
+            className={`rounded-lg px-3 py-1.5 text-sm transition ${
+              pathname.startsWith("/app/matcher")
+                ? "bg-line/60 font-medium text-ink"
+                : "text-muted hover:text-ink"
+            }`}
+          >
+            Matcher
+          </Link>
+        </div>
+
         {/* Right actions */}
         <div className="flex items-center gap-2">
           {/* Theme toggle */}
