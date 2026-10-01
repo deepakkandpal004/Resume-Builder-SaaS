@@ -1,67 +1,224 @@
-# Resume Builder
+# CareerForge — AI Resume Builder
 
-A full-stack resume builder with AI-powered writing assistance, ATS scoring, cover letter generation, and interview prep. Built with React, Node.js, and Groq AI.
+An AI-powered resume builder and job-application companion. Build ATS-friendly resumes, tailor them to any job description, and track every application in one pipeline — from job discovery to offer.
 
-![Resume Builder](https://img.shields.io/badge/stack-MERN-blue) ![License](https://img.shields.io/badge/license-ISC-green) ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
+![Next.js](https://img.shields.io/badge/Next.js-16-black) ![React](https://img.shields.io/badge/React-19-61dafb) ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8) ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47a248) ![Groq](https://img.shields.io/badge/AI-Groq-orange) ![License](https://img.shields.io/badge/license-ISC-green)
 
 ---
 
-## What it does
+## Features
 
-- Build a resume from scratch or import an existing PDF — the AI parses it into structured data automatically
-- Live preview updates as you type, with 7 templates and full color/font/spacing customization
-- **ATS Score Checker** — paste a job description, get a compatibility score with matched/missing keywords and improvement suggestions ranked by score impact
-- **Resume Tailor** — rewrites your summary, experience, and skills to match a specific JD
-- **Cover Letter Generator** — generates a tailored cover letter in formal, conversational, or enthusiastic tone
-- **Interview Prep** — generates 10 role-specific questions with suggested answers across Behavioural, Technical, Situational, and Role-Specific categories
-- Profile photo upload with background removal, face-crop, and live photo effect preview
-- Auto-save with 2.5s debounce, resume completeness score, and clean PDF export
+### Resume builder
+
+- Create resumes from scratch or import an existing PDF (AI parses it into structured data)
+- Live preview with multiple templates and full typography / color / spacing control
+- Auto-save with debounce, resume completeness score, drag-to-reorder sections
+- Resume versioning — snapshots before AI edits so nothing is ever lost
+- One-page PDF export that reflows content to fit instead of shrinking it
+- Profile photo upload with background removal and face crop (ImageKit)
+
+### AI toolkit (Groq)
+
+- **ATS score checker** — paste a job description, get a 0–100 compatibility score with matched / missing keywords and suggestions ranked by impact
+- **Tailor to JD** — rewrites summary, experience bullets, and skills to match a specific job posting
+- **Resume matcher** — paste a JD or job link, ranks all your resumes by fit (score, matched/missing skills, one-line reason)
+- **Cover letter generator** — tailored letters in formal, conversational, or enthusiastic tone
+- **Interview prep** — role-specific questions with suggested answers across behavioural, technical, situational, and role-specific categories
+- **Writing assistance** — enhance professional summary, rewrite bullets, suggest skills, enhance job descriptions
+
+### Job application tracker
+
+- Pipeline: Applied → Screening → Interview → Offer (+ Rejected / Withdrawn), with full status history
+- **Paste-to-import** — paste a confirmation email/SMS or a job link; AI extracts company, role, source, date, and URL automatically
+- Link resumes (and their ATS score at apply time) to each application
+- Stats dashboard: total applications, response rate, interviews, offers
+- Notes and timeline per application
+
+### Platform
+
+- Firebase Authentication (Google + email), server-verified ID tokens
+- Daily usage quotas per AI feature for free tier; premium tier via Razorpay
+- Dark mode, responsive UI
 
 ---
 
 ## Tech stack
 
-**Frontend**
-- React 19, Vite 7
-- Redux Toolkit (auth, ATS, cover letter, interview state)
-- Tailwind CSS v4
-- React Router v7
-- `@dnd-kit` for drag-to-reorder sections
-- `html2pdf.js` for PDF export
-- `react-pdftotext` for PDF import
-
-**Backend**
-- Node.js + Express 4
-- MongoDB + Mongoose
-- Firebase Authentication (ID tokens verified via firebase-admin)
-- Multer for file handling
-- Groq AI (OpenAI-compatible SDK, default model: `openai/gpt-oss-20b`)
-- ImageKit for image CDN, transforms, and background removal
-- Razorpay payments · Brevo (SMTP) transactional email
+| Layer      | Technology |
+| ---------- | ---------- |
+| Framework  | Next.js 16 (App Router), React 19 |
+| Styling    | Tailwind CSS v4, CSS custom properties |
+| State      | Redux Toolkit + redux-persist |
+| Auth       | Firebase Auth (client) + firebase-admin (server token verify) |
+| Database   | MongoDB Atlas + Mongoose |
+| AI         | Groq (OpenAI-compatible SDK), default `llama-3.3-70b-versatile` |
+| Payments   | Razorpay |
+| Images     | ImageKit (CDN, transforms, background removal) |
+| Email      | Brevo SMTP via nodemailer |
+| PDF        | html2canvas + jsPDF (export), react-pdftotext (import) |
+| Drag & drop | @dnd-kit |
 
 ---
 
-## Project structure
+## Architecture
 
 ```
-Resume Builder/
-├── client/                   # React frontend
-│   ├── src/
-│   │   ├── app/features/     # Redux slices (auth, ats, coverLetter, interview)
-│   │   ├── assets/templates/ # Resume template components
-│   │   ├── components/       # Forms, panels, UI components
-│   │   ├── hooks/            # useImageUpload, useTheme
-│   │   ├── pages/            # Dashboard, ResumeBuilder, Preview, Home
-│   │   └── utils/            # imagekit.js, completeness.js, templateHelpers.js
-│   └── public/
-└── server/                   # Express backend
-    ├── config/               # DB, AI, ImageKit, Multer setup
-    ├── controllers/          # Route handlers
-    ├── middlewares/          # Auth, rate limiters
-    ├── models/               # Mongoose schemas
-    ├── routes/               # API route definitions
-    └── services/             # ATS scoring logic
+┌─────────────────────────────────────────────────────────────┐
+│                        Browser                              │
+│  React 19 pages  ·  Redux Toolkit  ·  Tailwind v4           │
+│  apiClient (attaches fresh Firebase ID token per request)   │
+└──────────────────────────┬──────────────────────────────────┘
+                           │  HTTPS + Authorization: Bearer <ID token>
+┌──────────────────────────▼──────────────────────────────────┐
+│                  Next.js 16 App Router                      │
+│                                                             │
+│  Pages (/app/*):                                            │
+│    /app              dashboard (resume library)              │
+│    /app/builder/[id] resume editor + AI panels              │
+│    /app/applications job-application pipeline               │
+│    /app/matcher      JD → resume ranking                    │
+│    /app/upgrade      premium checkout                       │
+│                                                             │
+│  API routes (/api/*):                                       │
+│    protect()      → verifies Firebase ID token (firebase-   │
+│                     admin), resolves Mongo user             │
+│    checkQuota()   → per-feature daily limits (free tier);   │
+│                     premium bypasses; quota refunded on      │
+│                     failures so users never pay for errors   │
+│    services/      → atsService, quota utils, validators     │
+│    models/        → Mongoose schemas                        │
+└──────┬──────────────┬───────────────┬──────────────────────┘
+       │              │               │
+┌──────▼──────┐ ┌─────▼───────┐ ┌─────▼────────┐ ┌──────────────┐
+│ Firebase    │ │ MongoDB     │ │ Groq AI      │ │ Razorpay /   │
+│ Auth/Admin  │ │ Atlas       │ │ (llama-3.3   │ │ ImageKit /   │
+│ (identity)  │ │ (app data)  │ │  -70b)       │ │ Brevo (infra)│
+└─────────────┘ └─────────────┘ └──────────────┘ └──────────────┘
 ```
+
+### Data model (MongoDB)
+
+- **User** — firebaseUid, subscriptionTier (`free` | `premium`), profile
+- **Resume** — userId, structured content (sections, experience, skills), template, styling, `lastAts` snapshot
+- **ResumeVersion** — point-in-time snapshots of a resume (created before AI rewrites)
+- **Application** — userId, company, role, source, jobUrl, resumeId, versionId, atsScoreAtApply, status, statusHistory[], appliedAt, notes
+- **AtsScore / CoverLetter / InterviewQuestion** — persisted AI outputs per resume
+- **UsageCounter** — per-user, per-feature daily AI usage backing the quota system
+
+### Request lifecycle (AI routes)
+
+```
+Client → protect() → validate input → checkQuota() → Groq call
+   → validate AI output → refundQuotaOnError() on failure → persist → respond
+```
+
+Quota is always claimed **after** input validation and **refunded** on AI failure, rate limits, or invalid output — free-tier users never lose quota to errors.
+
+---
+
+## Key flows
+
+### 1. Sign in
+
+Firebase client SDK signs the user in → `apiClient` interceptor attaches a fresh Firebase ID token to every API request → `protect()` middleware verifies it with firebase-admin and maps it to the Mongo `User`.
+
+### 2. Build a resume
+
+Dashboard → create (blank or import PDF via `/api/ai/upload-resume`) → builder auto-saves edits (debounced) → version snapshot is stored before any AI rewrite → export to PDF.
+
+### 3. Check ATS score
+
+Builder → paste JD → `POST /api/ai/ats-score` → score 0–100 with matched/missing keywords and prioritized suggestions → result persisted to `AtsScore` and cached on the resume as `lastAts`.
+
+### 4. Tailor to a job
+
+Builder → Tailor panel → `POST /api/ai/tailor-resume` → summary, bullets, and skills rewritten against the JD → user reviews diff → saves as a new version.
+
+### 5. Match → tailor → track (the job-hunt loop)
+
+```
+/app/matcher → paste JD or job link → POST /api/resumes/match
+   → resumes ranked in ONE AI call (score, skills, reason, company/role)
+   → "Tailor in builder"  → opens builder with the JD prefilled
+   → "Track application" → opens /app/applications with company/role/
+                              URL/source prefilled → one click to save
+```
+
+Link-only input is fetched server-side and normalized to text first, so tailoring always works from real JD content. Scoring uses low temperature for run-to-run stability.
+
+### 6. Track an application
+
+`/app/applications` → new application (manual, or paste confirmation text / job link → `POST /api/applications/extract` pulls company, role, source, date, URL) → pick a resume (ATS score snapshotted at zero quota cost) → move it through the pipeline; every status change is recorded in `statusHistory`.
+
+### 7. Go premium
+
+`/app/upgrade` → Razorpay checkout → webhook verifies payment → `subscriptionTier: "premium"` → all quota checks bypassed.
+
+---
+
+## API reference
+
+### Resumes
+
+| Method | Route | Description |
+| ------ | ----- | ----------- |
+| POST | `/api/resumes/create` | Create resume |
+| POST | `/api/resumes/get` | Fetch resume(s) |
+| POST | `/api/resumes/update` | Update resume |
+| POST | `/api/resumes/delete` | Soft-delete resume |
+| POST | `/api/resumes/duplicate` | Duplicate resume |
+| POST | `/api/resumes/restore` | Restore deleted resume |
+| POST | `/api/resumes/versions` | List / create version snapshots |
+| POST | `/api/resumes/public` | Public share link handling |
+| POST | `/api/resumes/match` | Rank resumes against a JD or job link |
+
+### AI
+
+| Method | Route | Description |
+| ------ | ----- | ----------- |
+| POST | `/api/ai/ats-score` | ATS compatibility score vs JD |
+| POST | `/api/ai/tailor-resume` | Rewrite resume for a JD |
+| POST | `/api/ai/cover-letter` | Generate cover letter |
+| POST | `/api/ai/generate-cover-letter` | Cover letter (alt flow) |
+| POST | `/api/ai/interview-questions` | Role-specific Q&A |
+| POST | `/api/ai/enhance-pro-sum` | Enhance professional summary |
+| POST | `/api/ai/rewrite-bullets` | Rewrite experience bullets |
+| POST | `/api/ai/suggest-skills` | Skill suggestions |
+| POST | `/api/ai/enhance-job-desc` | Enhance a job description |
+| POST | `/api/ai/upload-resume` | Parse uploaded PDF into structured data |
+| POST | `/api/ai/score-resume` | General resume quality score |
+
+### Applications
+
+| Method | Route | Description |
+| ------ | ----- | ----------- |
+| POST | `/api/applications/create` | Track a new application |
+| GET  | `/api/applications/list` | List with status filter + resume populate |
+| PATCH / DELETE | `/api/applications/[id]` | Update status/fields, delete |
+| POST | `/api/applications/extract` | Extract company/role/source/date/URL from pasted text or link |
+
+### Other
+
+| Method | Route | Description |
+| ------ | ----- | ----------- |
+| — | `/api/users/*` | Profile & subscription |
+| — | `/api/payments/*` | Razorpay order + webhook verify |
+| — | `/api/imagekit/*` | Upload auth & transforms |
+
+All `/api/*` routes (except webhooks) require a Firebase ID token via `protect()`.
+
+---
+
+## Daily AI quotas (free tier)
+
+| Feature | Limit |
+| ------- | ----- |
+| ATS score | 1 / day |
+| Tailor resume | 3 / day |
+| Resume match | 10 / day |
+| Application extract | 30 / day |
+
+Premium users skip quota checks entirely. Quota is refunded automatically when the AI call fails.
 
 ---
 
@@ -69,174 +226,88 @@ Resume Builder/
 
 ### Prerequisites
 
-- Node.js 18+
-- MongoDB (local or Atlas)
-- [Groq API key](https://console.groq.com) — free tier available
-- [ImageKit account](https://imagekit.io) — free tier available
+- Node.js 22
+- MongoDB Atlas cluster (or local MongoDB)
+- Firebase project (Auth enabled)
+- Groq API key
+- Optional: Razorpay, ImageKit, Brevo SMTP keys
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/deepakkandpal004/Resume-Builder-SaaS.git
-cd "Resume-Builder-SaaS"
-```
-
-### 2. Server setup
+### Setup
 
 ```bash
-cd server
+git clone <repo-url>
+cd resume-builder
 npm install
-```
-
-Create `server/.env`:
-
-```env
-PORT=3000
-MONGODB_URI=your_mongodb_connection_string
-
-# Firebase Admin — either set the env var or place serviceAccountKey.json in server/config/
-FIREBASE_SERVICE_ACCOUNT={"type":"service_account", ...}
-
-GROQ_API_KEY=your_groq_api_key
-GROQ_BASE_URL=https://api.groq.com/openai/v1
-GROQ_MODEL=openai/gpt-oss-20b
-
-IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
-IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
-IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_imagekit_id
-
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-PROMO_CODES=CODE1,CODE2
-
-SMTP_HOST=smtp-relay.brevo.com
-SMTP_PORT=587
-SMTP_USER=your_smtp_user
-SMTP_PASS=your_smtp_pass
-SMTP_FROM=verified_sender@example.com
-CLIENT_URL=http://localhost:5173
-```
-
-```bash
-npm run server
-```
-
-### 3. Client setup
-
-```bash
-cd client
-npm install
-```
-
-Create `client/.env.local`:
-
-```env
-VITE_BASE_URL=http://localhost:3000
-VITE_IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
-VITE_IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_imagekit_id
-```
-
-```bash
+cp .env.example .env
+# fill in the values below, then:
 npm run dev
 ```
 
-Open `http://localhost:5173`
+Open http://localhost:3000.
 
----
+### Environment variables
 
-## Environment variables reference
+| Key | Description |
+| --- | ----------- |
+| `MONGODB_URI` | MongoDB connection string |
+| `NEXT_PUBLIC_FIREBASE_*` | Firebase client config |
+| `FIREBASE_SERVICE_ACCOUNT` | Service-account JSON (string or file path) for token verification |
+| `GROQ_API_KEY` | Groq API key |
+| `GROQ_BASE_URL` | Defaults to `https://api.groq.com/openai/v1` |
+| `GROQ_MODEL` | Defaults to `llama-3.3-70b-versatile` |
+| `IMAGEKIT_*` / `NEXT_PUBLIC_IMAGEKIT_*` | ImageKit keys & endpoint |
+| `SMTP_*` | Brevo SMTP credentials |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | Razorpay keys |
+| `CLIENT_URL` | App base URL |
 
-| Variable | Where | Description |
-|---|---|---|
-| `MONGODB_URI` | server | MongoDB connection string |
-| `FIREBASE_SERVICE_ACCOUNT` | server | Firebase Admin service account JSON (or `server/config/serviceAccountKey.json`) |
-| `GROQ_API_KEY` | server | Groq API key for AI features |
-| `GROQ_MODEL` | server | Model name (default: `openai/gpt-oss-20b`) |
-| `IMAGEKIT_PUBLIC_KEY` | server + client | ImageKit public key |
-| `IMAGEKIT_PRIVATE_KEY` | server only | ImageKit private key — never expose to client |
-| `IMAGEKIT_URL_ENDPOINT` | server + client | Your ImageKit URL endpoint |
-| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | server | Razorpay payment credentials |
-| `PROMO_CODES` | server | Comma-separated premium promo codes |
-| `SMTP_*` | server | Brevo SMTP credentials for transactional email |
-| `CLIENT_URL` | server | Allowed CORS origin(s), comma-separated |
-| `SENTRY_DSN` | server | Optional — Sentry error tracking (no-ops if unset) |
-| `LOG_LEVEL` | server | Optional — pino log level (default: `info`) |
-| `VITE_BASE_URL` | client | Backend API base URL |
+> If the same key exists in both `.env` and `.env.local`, `.env.local` wins (Next.js convention).
 
----
-
-## API overview
-
-| Method | Route | Description |
-|---|---|---|
-| `POST` | `/api/users/register` | Register a new user |
-| `POST` | `/api/users/login` | Login, returns JWT |
-| `GET` | `/api/users/resumes` | List all resumes for current user |
-| `POST` | `/api/resumes/create` | Create a new resume |
-| `PUT` | `/api/resumes/update` | Update resume data |
-| `DELETE` | `/api/resumes/delete/:id` | Delete a resume |
-| `GET` | `/api/resumes/public/:id` | Get a public resume (no auth) |
-| `GET` | `/api/imagekit/auth` | Get ImageKit upload auth token |
-| `POST` | `/api/ai/upload-resume` | Parse a PDF resume with AI |
-| `POST` | `/api/ai/enhance-pro-sum` | AI-enhance professional summary |
-| `POST` | `/api/ai/enhance-job-desc` | AI-enhance job description bullet |
-| `POST` | `/api/ai/tailor-resume` | Tailor resume to a job description |
-| `POST` | `/api/ai/ats-score` | Run ATS scan (1/day free tier) |
-| `GET` | `/api/ai/ats-score/:resumeId` | Get ATS scan history |
-| `POST` | `/api/ai/generate-cover-letter` | Generate cover letter (3/day free tier) |
-| `GET` | `/api/ai/cover-letter/:resumeId` | Get cover letter history |
-| `DELETE` | `/api/ai/cover-letter/:id` | Delete a cover letter |
-| `POST` | `/api/ai/interview-questions` | Generate interview Q&A (3/day free tier) |
-| `GET` | `/api/ai/interview-questions/:resumeId` | Get saved interview question sets |
-| `POST` | `/api/ai/score-resume` | General resume quality score (no JD) |
-| `POST` | `/api/ai/rewrite-bullets` | AI-rewrite experience bullet points |
-| `POST` | `/api/ai/suggest-skills` | Suggest skills for a target role |
-| `POST` | `/api/payments/create-order` | Create Razorpay order (₹299 premium) |
-| `POST` | `/api/payments/verify-payment` | Verify payment signature, activate premium |
-| `POST` | `/api/users/upgrade` | Upgrade via promo code |
-
----
-
-## Free tier limits
-
-| Feature | Free tier |
-|---|---|
-| ATS scans | 1 per day |
-| Cover letters | 3 per day |
-| Interview prep sets | 3 per day |
-| Resume tailoring | Unlimited |
-| AI enhancements | Unlimited |
-
----
-
-## Running tests
+### Scripts
 
 ```bash
-# Server tests
-cd server && npm test
-
-# Client tests
-cd client && npm test
+npm run dev    # start dev server (Turbopack)
+npm run build  # production build
+npm start      # serve production build
+npm run lint   # eslint
 ```
 
 ---
 
-## Deployment
+## Project structure
 
-The project is configured for deployment with:
-- **Client** → any static host (Vercel, Netlify, GitHub Pages)
-- **Server** → any Node.js host (Render, Railway, Fly.io)
-
-A GitHub Actions workflow is included at `.github/workflows/deploy.yml`.
-
-Set `VITE_BASE_URL` in your client environment to your deployed server URL before building.
-
-```bash
-cd client && npm run build   # outputs to client/dist/
+```
+resume-builder/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── page.tsx            # landing page
+│   │   ├── login/              # sign in
+│   │   ├── app/                # authenticated area
+│   │   │   ├── page.tsx        # dashboard (resume library)
+│   │   │   ├── builder/[id]/   # resume editor
+│   │   │   ├── applications/   # job-application tracker
+│   │   │   ├── matcher/        # JD → resume ranking
+│   │   │   └── upgrade/        # premium checkout
+│   │   └── api/                # route handlers (see API reference)
+│   ├── old-pages/              # page-level React components (builder, tracker, matcher…)
+│   ├── components/             # shared UI (Navbar, templates, tailor panels…)
+│   ├── assets/templates/       # resume template components
+│   ├── hooks/                  # shared React hooks
+│   ├── utils/                  # client utilities
+│   ├── types/                  # TypeScript types
+│   └── lib/
+│       ├── config/             # db, ai, firebase, apiClient, mailer, imageKit
+│       ├── middlewares/        # protect (auth), quota
+│       ├── models/             # Mongoose schemas
+│       ├── services/           # atsService, quota utils…
+│       ├── validators/         # zod schemas
+│       ├── store/              # Redux slices
+│       └── observability/      # logging (pino)
+├── public/                     # static assets
+└── README.md
 ```
 
 ---
 
 ## License
 
-ISC — see [LICENSE](LICENSE) for details.
+ISC
