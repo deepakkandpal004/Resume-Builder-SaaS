@@ -160,6 +160,8 @@ export async function POST(request: NextRequest) {
     try {
       const response = await getAI().chat.completions.create({
         model: GROQ_MODEL as any,
+        // Low temperature keeps match scores stable across runs.
+        temperature: 0.1,
         messages: [
           {
             role: "system",
