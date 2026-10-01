@@ -439,25 +439,58 @@ const ResumeBuilder = () => {
     }
 
     try {
-      const html2pdf = (await import("html2pdf.js")).default;
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
+
+      const pageSize = resumeData?.style_options?.pageSize || "letter";
+      // Page size in inches.
+      const pageW = pageSize === "a4" ? 8.27 : 8.5;
+      const pageH = pageSize === "a4" ? 11.69 : 11;
+      // Page height in CSS px (96 px = 1 in).
+      const pagePxH = pageSize === "a4" ? 1122 : 1056;
+
+      // Long resumes: reflow text at a smaller base font so the content fits
+      // one page at full width (no side margins). Template spacing uses em,
+      // so everything scales proportionally.
+      const templateRoot = clonePreview.firstElementChild;
+      if (templateRoot && clonePreview.scrollHeight > pagePxH) {
+        let size = parseFloat(window.getComputedStyle(templateRoot).fontSize) || 14;
+        templateRoot.style.lineHeight = "1.35";
+        while (clonePreview.scrollHeight > pagePxH && size > 9.5) {
+          size -= 0.5;
+          templateRoot.style.fontSize = size + "px";
+        }
+      }
+
+      // Content size in inches (96 CSS px = 1 in).
+      const contentW = clonePreview.scrollWidth / 96;
+      const contentH = clonePreview.scrollHeight / 96;
+
+      const canvas = await html2canvas(clonePreview, {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+      });
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
+
+      const pdf = new jsPDF({
+        unit: "in",
+        format: pageSize,
+        orientation: "portrait",
+      });
+
+      // Fallback: if content still exceeds one page, shrink uniformly to fit.
+      // (After the reflow above this is normally fit = 1, i.e. full size.)
+      const fit = Math.min(pageW / contentW, pageH / contentH, 1);
+      const w = contentW * fit;
+      const h = contentH * fit;
+      pdf.addImage(imgData, "JPEG", (pageW - w) / 2, 0, w, h);
+
       const filename =
         (resumeData?.personal_info?.full_name || "resume")
           .replace(/\s+/g, "_")
           .toLowerCase() + "_resume.pdf";
-      await html2pdf()
-        .set({
-          margin: 0,
-          filename,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-          jsPDF: {
-            unit: "in",
-            format: resumeData?.style_options?.pageSize || "letter",
-            orientation: "portrait",
-          },
-        })
-        .from(clonePreview)
-        .save();
+      pdf.save(filename);
       toast.success("PDF exported!", { id: toastId });
     } catch {
       toast.error("PDF export failed. Try using the preview page.", { id: toastId });
@@ -1212,38 +1245,29 @@ const ResumeBuilder = () => {
           </div>
 
           {/* Preview scroll area */}
-          <div className="flex-1 overflow-auto bg-slate-100/70 dark:bg-zinc-900/70" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          <div className="flex-1 overflow-auto bg-slate-100/70 dark:bg-zinc-900/70">
             <div className="min-h-full bg-canvas">
-              <div ref={previewContainerRef} className="w-full h-full flex items-start justify-center py-10 px-4">
-
+              <div ref={previewContainerRef} className="w-full flex items-start justify-center py-10 px-4">
                 {/*
-                  Height-compensation wrapper:
-                  CSS transform: scale() does NOT affect layout flow.
-                  We set height = innerHeight * finalScale (the visual height)
-                  and overflow:hidden to clip the excess layout space.
+                  CSS zoom (instead of transform: scale()) participates in layout,
+                  so the paper always occupies exactly its scaled size - no measured
+                  height needed, no overflow clipping, long resumes never get cut off.
                 */}
                 <div
-                  className="relative overflow-hidden"
-                  style={{ height: Math.max(innerHeight * finalScale, 100) }}
+                  className="premium-paper"
+                  style={{
+                    width: RESUME_WIDTH,
+                    zoom: String(finalScale),
+                    borderRadius: 4,
+                  }}
                 >
-                  <div
-                    className="premium-paper"
-                    style={{
-                      width: RESUME_WIDTH,
-                      transformOrigin: "top left",
-                      transform: "scale(" + finalScale + ")",
-                      borderRadius: 4,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div ref={previewInnerRef}>
-                      <ResumePreview
-                        data={resumeData}
-                        template={resumeData.template}
-                        accentColor={resumeData.accent_color}
-                        styleOptions={resumeData.style_options}
-                      />
-                    </div>
+                  <div ref={previewInnerRef}>
+                    <ResumePreview
+                      data={resumeData}
+                      template={resumeData.template}
+                      accentColor={resumeData.accent_color}
+                      styleOptions={resumeData.style_options}
+                    />
                   </div>
                 </div>
               </div>

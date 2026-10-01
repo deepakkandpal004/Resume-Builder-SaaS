@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from "next/navigation";
 import { 
@@ -150,9 +150,9 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
     setActiveModalTab('summary');
 
     try {
-      const { data } = await api.post('/api/ai/tailor-resume', 
-        { resumeId, jobDescription },
-        { headers: { Authorization: `Bearer ${token}` } }
+      // NOTE: no manual Authorization header — apiClient's interceptor attaches a fresh Firebase token
+      const { data } = await api.post('/api/ai/tailor-resume',
+        { resumeId, jobDescription }
       );
       setTailorData(data);
     } catch (error) {
@@ -198,7 +198,6 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
 
       await api.put("/api/resumes/update", formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -222,8 +221,7 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
       const newTitle = `${resumeData.title || "Untitled"} (Tailored)`;
       const createRes = await api.post(
         "/api/resumes/create",
-        { title: newTitle },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { title: newTitle }
       );
       
       const newResumeId = createRes.data.resume._id;
@@ -261,7 +259,6 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
 
       await api.put("/api/resumes/update", formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -276,9 +273,17 @@ const ATS_Results_Panel = ({ resumeId, resumeData, onNavigateTab, onReloadResume
     }
   };
 
-  // Part 12.1 — fetch on mount when idle with no data
+  // Part 12.1 — fetch once on mount when idle with no data (guard against refetch loop)
+  const fetchedHistoryFor = useRef(null);
   useEffect(() => {
-    if (resumeId && currentScan === null && scanStatus === 'idle' && historyStatus === 'idle') {
+    if (
+      resumeId &&
+      fetchedHistoryFor.current !== resumeId &&
+      currentScan === null &&
+      scanStatus === 'idle' &&
+      historyStatus === 'idle'
+    ) {
+      fetchedHistoryFor.current = resumeId;
       dispatch(fetchLatestScan(resumeId));
     }
   }, [resumeId, currentScan, scanStatus, historyStatus, dispatch]);

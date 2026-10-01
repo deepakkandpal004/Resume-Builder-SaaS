@@ -1,8 +1,6 @@
 "use client";
 import { Check, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const plans = [
   {
@@ -13,15 +11,15 @@ const plans = [
     desc: "Build a complete resume without paying upfront.",
     categories: [
       {
-        title: "Rewriting Features",
+        title: "Rewriting features",
         features: [
-          "Bullet Rewriter (10/day)",
-          "Resume Tailor (3/day)",
-          "ATS Score Check (1/day)",
+          "Bullet rewriter (10/day)",
+          "Resume tailor (3/day)",
+          "ATS score check (1/day)",
         ],
       },
       {
-        title: "Resume Features",
+        title: "Resume features",
         features: [
           "All 6 templates",
           "Full customization",
@@ -29,7 +27,7 @@ const plans = [
         ],
       },
       {
-        title: "Export & Sharing",
+        title: "Export & sharing",
         features: [
           "PDF export",
         ],
@@ -44,64 +42,38 @@ const plans = [
     price: "299",
     currency: "₹",
     period: "lifetime",
-    desc: "Unlock unlimited rewriting with a single payment.",
+    desc: "Unlimited rewriting for a single payment.",
     categories: [
       {
-        title: "Rewriting Features",
+        title: "Rewriting features",
         features: [
-          "Unlimited Bullet Rewrites",
-          "Unlimited Resume Tailor",
-          "Unlimited ATS Score Check",
+          "Unlimited bullet rewrites",
+          "Unlimited resume tailor",
+          "Unlimited ATS score check",
           "Priority processing",
         ],
       },
       {
-        title: "Resume Features",
+        title: "Resume features",
         features: [
           "Everything in Free",
-          "Unlimited Cover Letters",
-          "Unlimited Interview Prep",
+          "Unlimited cover letters",
+          "Unlimited interview prep",
         ],
       },
     ],
-    cta: "Go Pro",
+    cta: "Get Pro",
     href: "/app/upgrade",
     highlighted: true,
   },
 ];
 
 const Pricing = () => {
-  const ref = useScrollReveal();
-  const shouldReduceMotion = useReducedMotion();
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: shouldReduceMotion ? 0 : 0.05,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    },
-  };
-
   return (
     <section id="pricing" className="relative overflow-hidden px-6 py-24 md:px-10">
       <div className="section-line absolute top-0 inset-x-0" />
 
-      <div ref={ref} className="mx-auto max-w-5xl reveal">
+      <div className="mx-auto max-w-5xl">
         {/* Header Block */}
         <div className="flex flex-col items-center text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-xs font-bold text-brand-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-brand-400">
@@ -116,28 +88,28 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+        <div
           className="mt-14 grid gap-8 md:grid-cols-2 items-stretch max-w-4xl mx-auto"
         >
           {plans.map((plan) => {
             const isPro = plan.highlighted;
 
             return (
-              <motion.div
-                variants={cardVariants}
+              <div
                 key={plan.name}
-                className={`relative flex flex-col h-full rounded-[20px] border transition-all duration-250 ease-out transform-gpu select-none outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:-translate-y-1.5 ${
+                className={`relative flex flex-col h-full rounded-2xl border bg-surface transition-colors select-none outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
                   isPro
-                    ? "border-brand-500 bg-surface shadow-md order-1 md:order-2 z-10"
-                    : "border-line/60 bg-surface shadow-xs order-2 md:order-1"
+                    ? "border-emerald-600/50 order-1 md:order-2 hover:border-emerald-600/70"
+                    : "border-line order-2 md:order-1 hover:border-emerald-600/40"
                 }`}
               >
                 {/* Card Header */}
                 <div className="p-8 pb-0">
+                  {isPro && (
+                    <span className="mb-2 inline-block text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      Most popular
+                    </span>
+                  )}
                   <h3 className="text-xl font-bold text-ink">{plan.name}</h3>
                   <p className="mt-2 text-xs font-bold text-muted min-h-[32px]">{plan.desc}</p>
                   
@@ -181,21 +153,21 @@ const Pricing = () => {
                   <Link
                     href={plan.href}
                     aria-label={`Get started with ${plan.name} plan`}
-                    className={`group flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-center text-sm font-semibold transition-all duration-250 ease-out transform-gpu active:scale-98 ${
+                    className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors ${
                       isPro
-                        ? "bg-slate-800 text-white shadow-lg shadow-slate-800/20 hover:bg-slate-700 hover:-translate-y-0.5 hover:scale-[1.01]"
-                        : "border border-line bg-surface/35 hover:border-brand-500/30 text-body hover:text-ink shadow-xs hover:shadow-md"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "border border-line bg-surface text-body hover:text-ink hover:border-emerald-600/40"
                     }`}
                   >
                     <span>{plan.cta}</span>
-                    <ArrowRight className="size-4 transition-transform duration-250 ease-out transform-gpu group-hover:translate-x-1" />
+                    <ArrowRight className="size-4" />
                   </Link>
                 </div>
 
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
 
       </div>
 

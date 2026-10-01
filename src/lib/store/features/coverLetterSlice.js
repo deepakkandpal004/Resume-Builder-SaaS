@@ -31,12 +31,12 @@ export const generateCoverLetter = createAsyncThunk(
   }
 );
 
-// Thunk: GET /api/ai/cover-letter/:resumeId
+// Thunk: GET /api/ai/cover-letter/history/:resumeId
 export const fetchCoverLetters = createAsyncThunk(
   "coverLetter/fetch",
   async (resumeId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/api/ai/cover-letter/${resumeId}`);
+      const response = await api.get(`/api/ai/cover-letter/history/${resumeId}`);
       return response.data;
     } catch (err) {
       return rejectWithValue({
@@ -46,12 +46,12 @@ export const fetchCoverLetters = createAsyncThunk(
   }
 );
 
-// Thunk: DELETE /api/ai/cover-letter/:letterId
+// Thunk: DELETE /api/ai/cover-letter/delete/:letterId
 export const deleteCoverLetter = createAsyncThunk(
   "coverLetter/delete",
   async (letterId, { rejectWithValue }) => {
     try {
-      await api.delete(`/api/ai/cover-letter/${letterId}`);
+      await api.delete(`/api/ai/cover-letter/delete/${letterId}`);
       return { letterId };
     } catch (err) {
       return rejectWithValue({

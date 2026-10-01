@@ -57,7 +57,15 @@ const waitForUser = async () => {
 
 api.interceptors.request.use(async (config) => {
   try {
-    if (!config.headers.Authorization) {
+    const sentHeader = config.headers.Authorization;
+    // Some call sites send `Bearer ${token}` with a token that was never populated
+    // (state.auth has no token field) — treat those as missing and attach a fresh token.
+    const hasRealToken =
+      typeof sentHeader === "string" &&
+      sentHeader.startsWith("Bearer ") &&
+      !["Bearer undefined", "Bearer null", "Bearer"].includes(sentHeader.trim());
+
+    if (!hasRealToken) {
       const user = await waitForUser();
       if (user) {
         const token = await user.getIdToken();

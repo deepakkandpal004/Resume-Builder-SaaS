@@ -1,18 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Lightbulb, LayoutDashboard, BarChart3, ArrowRight } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { FileText, Lightbulb, LayoutDashboard, BarChart3 } from "lucide-react";
 
 const TABS = [
-  { id: "builder", label: "Resume Builder", icon: FileText },
-  { id: "ai", label: "Writing Review", icon: Lightbulb },
+  { id: "builder", label: "Resume builder", icon: FileText },
+  { id: "ai", label: "Writing review", icon: Lightbulb },
   { id: "templates", label: "Templates", icon: LayoutDashboard },
-  { id: "ats", label: "Role Review", icon: BarChart3 },
+  { id: "ats", label: "Role review", icon: BarChart3 },
 ];
 
 const BrowserChrome = ({ children, savedTime, statusText }) => (
-  <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-2xl relative">
+  <div className="overflow-hidden rounded-2xl border border-line bg-surface relative">
     {/* Browser header bar */}
     <div className="flex items-center justify-between border-b border-line px-4 py-3 bg-line/10">
       <div className="flex items-center gap-2">
@@ -25,7 +23,7 @@ const BrowserChrome = ({ children, savedTime, statusText }) => (
         </span>
       </div>
       <div className="flex items-center gap-2 text-[10px] font-semibold text-muted">
-        <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="size-1.5 rounded-full bg-emerald-500" />
         <span>{statusText || "Draft"}</span>
         <span className="text-line">•</span>
         <span>Saved {savedTime || "just now"}</span>
@@ -36,7 +34,6 @@ const BrowserChrome = ({ children, savedTime, statusText }) => (
 );
 
 const ProductShowcase = () => {
-  const scrollRef = useScrollReveal();
   const [activeTab, setActiveTab] = useState("builder");
 
   // Template State
@@ -50,13 +47,13 @@ const ProductShowcase = () => {
     <section id="product-showcase" className="relative overflow-hidden px-6 py-28 md:px-10">
       <div className="section-line absolute top-0 inset-x-0" />
 
-      <div ref={scrollRef} className="mx-auto max-w-7xl reveal">
+      <div className="mx-auto max-w-7xl">
         
         {/* Outcome-driven header block */}
         <div className="flex flex-col items-center text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-teal-500/20 bg-teal-500/10 px-4 py-1.5 text-xs font-bold text-teal-600 dark:text-accent-400">
-            <LayoutDashboard className="size-4 text-brand-500 animate-pulse" />
-            <span>Product Showcase</span>
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-bold text-muted dark:text-accent-400">
+            <LayoutDashboard className="size-4" />
+            <span>Product showcase</span>
           </div>
           <h2 className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl lg:text-6xl leading-[1.1] max-w-4xl">
             Everything happens in one workspace
@@ -68,15 +65,15 @@ const ProductShowcase = () => {
           {/* Minimal Feature pills */}
           <div className="mt-6 flex flex-wrap justify-center gap-2.5 max-w-2xl">
             {[
-              { label: "⚡ Live Preview" },
-              { label: "✦ Smart Rewrite" },
-              { label: "📄 ATS Templates" },
-              { label: "📈 ATS Checker" },
-              { label: "⬇ Export PDF" }
+              { label: "Live preview" },
+              { label: "Smart rewrite" },
+              { label: "ATS templates" },
+              { label: "ATS checker" },
+              { label: "Export PDF" }
             ].map((pill) => (
               <span
                 key={pill.label}
-                className="px-3.5 py-1.5 rounded-full text-[10.5px] font-bold border border-line bg-surface/35 text-ink hover:-translate-y-0.5 hover:border-brand-500/20 hover:shadow-xs transition duration-200 cursor-default flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-full text-[10.5px] font-bold border border-line bg-surface text-ink flex items-center gap-1.5"
               >
                 {pill.label}
               </span>
@@ -86,7 +83,7 @@ const ProductShowcase = () => {
 
         {/* Tab Selection */}
         <div className="mt-10 max-w-5xl mx-auto px-0 sm:px-4">
-          <div className="flex flex-wrap justify-center gap-2 rounded-2xl border border-line bg-surface/30 p-1.5">
+          <div className="flex flex-wrap justify-center gap-2 rounded-2xl border border-line bg-surface p-1.5">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -94,20 +91,14 @@ const ProductShowcase = () => {
                 <button
                   key={tab.id}
                   onClick={() => handleTabClick(tab.id)}
-                  className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all duration-300 relative cursor-pointer ${
+                  className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-colors relative cursor-pointer ${
                     isActive
-                      ? "bg-brand-500/10 text-brand-600 shadow-xs"
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                       : "text-muted hover:text-ink"
                   }`}
                 >
-                  <Icon className="size-4 animate-pulse-soft" />
+                  <Icon className="size-4" />
                   <span>{tab.label}</span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="showcase-underline"
-                      className="absolute bottom-0 inset-x-0 h-[2px] bg-brand-500 rounded-full"
-                    />
-                  )}
                 </button>
               );
             })}
@@ -117,7 +108,7 @@ const ProductShowcase = () => {
           <div className="mt-10 relative">
             
             {/* Main Browser Mockup Container */}
-            <div className="rounded-2xl border border-line bg-surface/20 shadow-2xl">
+            <div className="rounded-2xl border border-line bg-surface shadow-sm">
               <BrowserChrome 
                 savedTime="your changes"
                 statusText="Workspace preview"
@@ -130,7 +121,7 @@ const ProductShowcase = () => {
                       <span className="text-[9px] uppercase font-bold text-muted tracking-widest">Workspace</span>
                       <div className="h-7.5 rounded-lg bg-brand-500/10 text-brand-600 flex items-center px-2.5 gap-2 text-xs font-bold border border-brand-500/20">
                         <FileText className="size-3.5" />
-                        <span>My Resumes</span>
+                        <span>My resumes</span>
                       </div>
                     </div>
 
@@ -144,50 +135,38 @@ const ProductShowcase = () => {
                   </div>
 
                   {/* Left Workspace Panel (Editor or Stats side) */}
-                  <div className="flex-1 p-5 overflow-y-auto border-r border-line bg-surface/50">
-                    <AnimatePresence mode="wait">
+                  <div className="flex-1 p-5 overflow-y-auto border-r border-line bg-surface">
+                    <>
                       
                       {/* 1. Builder Editor Simulator */}
                       {activeTab === "builder" && (
-                        <motion.div
-                          key="builder-left"
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 8 }}
-                          className="space-y-3.5"
-                        >
+                        <div key="builder-left" className="space-y-3.5">
                           <div className="space-y-1">
-                            <label className="text-[9.5px] uppercase font-bold text-muted">Full Name</label>
+                            <label className="text-[9.5px] uppercase font-bold text-muted">Full name</label>
                             <div className="h-9 rounded-lg border border-line bg-surface px-3 flex items-center text-xs text-ink font-semibold">
                               Jordan Lee
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-[9.5px] uppercase font-bold text-muted">Target Position</label>
+                            <label className="text-[9.5px] uppercase font-bold text-muted">Target position</label>
                             <div className="h-9 rounded-lg border border-brand-500/30 bg-surface px-3 flex items-center text-xs text-brand-600 font-bold">
                               <span>Product Designer</span>
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-[9.5px] uppercase font-bold text-muted">Professional Experience</label>
+                            <label className="text-[9.5px] uppercase font-bold text-muted">Professional experience</label>
                             <div className="rounded-lg border border-line bg-surface p-3 text-xs text-muted leading-relaxed font-semibold h-24">
                               Developed scalable SaaS applications using React and Node.js. Optimized database metrics to improve core LCP.
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
 
                       {/* 2. AI Optimization Step Flow */}
                       {activeTab === "ai" && (
-                        <motion.div
-                          key="ai-left"
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 8 }}
-                          className="space-y-4"
-                        >
+                        <div key="ai-left" className="space-y-4">
                           <div className="flex items-center gap-3 p-3.5 rounded-xl border border-brand-500/25 bg-brand-500/[0.04]">
                             <Lightbulb className="size-5 text-brand-500" />
                             <div>
@@ -199,7 +178,7 @@ const ProductShowcase = () => {
                           {/* Rewrite comparison card */}
                           <div className="space-y-3 p-4 rounded-xl border border-line bg-surface">
                             <div>
-                              <span className="text-[8.5px] uppercase font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">Weak Description</span>
+                              <span className="text-[8.5px] uppercase font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">Weak description</span>
                               <p className="text-xs text-muted mt-2 font-semibold">"I helped speed up database queries."</p>
                             </div>
 
@@ -214,19 +193,13 @@ const ProductShowcase = () => {
                               </p>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
 
                       {/* 3. Templates Showcase Toggles */}
                       {activeTab === "templates" && (
-                        <motion.div
-                          key="templates-left"
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 8 }}
-                          className="space-y-3"
-                        >
-                          <span className="text-[9.5px] uppercase font-bold text-muted tracking-wider">Select Layout Template</span>
+                        <div key="templates-left" className="space-y-3">
+                          <span className="text-[9.5px] uppercase font-bold text-muted tracking-wider">Select layout template</span>
                           <div className="grid grid-cols-2 gap-2.5">
                             {["Modern", "Professional", "Minimal", "Executive"].map((template) => {
                               const isSel = selectedTemplate === template;
@@ -234,7 +207,7 @@ const ProductShowcase = () => {
                                 <div
                                   key={template}
                                   onClick={() => setSelectedTemplate(template)}
-                                  className={`p-3 rounded-xl border cursor-pointer text-left transition-all duration-200 ${
+                                  className={`p-3 rounded-xl border cursor-pointer text-left transition-colors ${
                                     isSel 
                                       ? "border-brand-500 bg-brand-500/[0.04]" 
                                       : "border-line bg-surface hover:border-brand-500/30"
@@ -248,19 +221,13 @@ const ProductShowcase = () => {
                             );
                           })}
                         </div>
-                      </motion.div>
+                      </div>
                     )}
 
                     {/* 4. ATS Match Audit Metrics */}
                     {activeTab === "ats" && (
-                      <motion.div
-                        key="ats-left"
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 8 }}
-                        className="space-y-4"
-                      >
-                        <span className="text-[9.5px] uppercase font-bold text-muted tracking-wider block">ATS Compliance Analysis</span>
+                      <div key="ats-left" className="space-y-4">
+                        <span className="text-[9.5px] uppercase font-bold text-muted tracking-wider block">ATS compliance analysis</span>
                         
                         {/* Match metrics progress list */}
                         <div className="space-y-3">
@@ -268,17 +235,15 @@ const ProductShowcase = () => {
                             { name: "Required terms", status: "Review" , width: "72%" },
                             { name: "Relevant experience", status: "Review", width: "58%" },
                             { name: "Readable structure", status: "Present", width: "86%" },
-                          ].map((item, index) => (
+                          ].map((item) => (
                             <div key={item.name} className="space-y-1">
                               <div className="flex items-center justify-between text-[11px] font-bold text-ink">
                                 <span>{item.name}</span>
                                 <span>{item.status}</span>
                               </div>
                               <div className="h-1.5 w-full bg-line rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: item.width }}
-                                  transition={{ duration: 1.2, delay: index * 0.15 }}
+                                <div
+                                  style={{ width: item.width }}
                                   className="h-full bg-brand-500"
                                 />
                               </div>
@@ -297,19 +262,19 @@ const ProductShowcase = () => {
                             ))}
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     )}
 
-                  </AnimatePresence>
+                  </>
                 </div>
 
                 {/* Right Document A4 Live Preview Mockup */}
                 <div className="w-56 p-5 flex flex-col justify-center bg-line/20 relative">
                   
-                  <div className="text-[8px] font-bold uppercase tracking-wider text-muted mb-2 text-center">Live Preview</div>
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-muted mb-2 text-center">Live preview</div>
 
                   {/* Document sheet */}
-                  <div className="flex-1 bg-white border border-line rounded-lg p-4 shadow-sm flex flex-col justify-between text-left relative overflow-hidden transition-all duration-300">
+                  <div className="flex-1 bg-white border border-line rounded-lg p-4 shadow-sm flex flex-col justify-between text-left relative overflow-hidden">
                     
                     {/* Template styles adjustments preview based on selection tab */}
                     <div className={`space-y-3.5 h-full flex flex-col justify-between ${

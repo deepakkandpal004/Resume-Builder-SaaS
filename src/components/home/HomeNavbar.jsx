@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X, ArrowRight, BadgeCheck } from "lucide-react";
-import { motion } from "framer-motion";
 import Logo from "../Logo";
 import ThemeToggle from "../ThemeToggle";
 import { logout } from "@/lib/store/features/authSlice";
@@ -25,7 +24,6 @@ const HomeNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileMenuRef = useRef(null);
 
@@ -95,7 +93,7 @@ const HomeNavbar = () => {
 
   return (
     <nav
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-250 ease-out flex items-center ${
+      className={`fixed inset-x-0 top-0 z-50 transition-colors flex items-center ${
         scrolled
           ? "h-16 bg-surface/75 backdrop-blur-[18px] border-b border-line/45 shadow-sm"
           : "h-20 bg-transparent border-b border-transparent"
@@ -107,7 +105,7 @@ const HomeNavbar = () => {
           <Logo size="md" variant="auto" />
         </Link>
 
-        {/* Desktop nav links with sliding hover indicator */}
+        {/* Desktop nav links with active-section indicator */}
         <div className="hidden items-center gap-1 md:flex relative">
           {NAV_LINKS.map((l) => {
             const isActive = l.href === `#${activeSection}`;
@@ -115,9 +113,7 @@ const HomeNavbar = () => {
               <a
                 key={l.label}
                 href={l.href}
-                onMouseEnter={() => setHoveredLink(l.label)}
-                onMouseLeave={() => setHoveredLink(null)}
-                className={`relative px-4 py-2 text-sm font-semibold tracking-tight transition-colors duration-200 cursor-pointer ${
+                className={`relative px-4 py-2 text-sm font-semibold tracking-tight transition-colors cursor-pointer ${
                   isActive
                     ? "text-brand-600 dark:text-brand-400"
                     : "text-body hover:text-brand-600 dark:hover:text-brand-400"
@@ -125,18 +121,7 @@ const HomeNavbar = () => {
               >
                 <span>{l.label}</span>
                 {isActive && (
-                  <motion.span
-                    layoutId="activeUnderline"
-                    className="absolute bottom-0 inset-x-4 h-0.5 bg-brand-500 dark:bg-brand-400 rounded-full"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-                {hoveredLink === l.label && !isActive && (
-                  <motion.span
-                    layoutId="hoverUnderline"
-                    className="absolute bottom-0 inset-x-4 h-0.5 bg-line rounded-full"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
+                  <span className="absolute bottom-0 inset-x-4 h-0.5 bg-brand-500 dark:bg-brand-400 rounded-full" />
                 )}
               </a>
             );
@@ -152,17 +137,17 @@ const HomeNavbar = () => {
             <div className="flex items-center gap-3.5">
               <Link
                 href="/app"
-                className="nav-cta-primary group px-4.5 py-1.5 text-xs font-bold flex items-center gap-1 bg-brand-600 text-white rounded-full transition-all hover:bg-brand-700 active:scale-95 shadow-md shadow-brand-500/10 cursor-pointer"
+                className="flex items-center gap-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-4.5 py-1.5 text-xs font-bold transition-colors cursor-pointer"
               >
                 <span>Dashboard</span>
-                <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                <ArrowRight className="size-3.5" />
               </Link>
               
               {/* Profile Dropdown */}
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex size-8 items-center justify-center rounded-full border border-line bg-surface/80 hover:bg-canvas transition-colors cursor-pointer active:scale-95"
+                  className="flex size-8 items-center justify-center rounded-full border border-line bg-surface/80 hover:bg-canvas transition-colors cursor-pointer"
                 >
                   <div className="flex size-7 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-xs font-bold text-brand-700 dark:text-brand-300">
                     {user.name ? user.name[0].toUpperCase() : "U"}
@@ -188,7 +173,7 @@ const HomeNavbar = () => {
                       onClick={() => setProfileDropdownOpen(false)}
                       className="flex items-center gap-2 px-3.5 py-2 text-xs text-muted hover:bg-line/10 transition-colors"
                     >
-                      <span>Go to Dashboard</span>
+                      <span>Go to dashboard</span>
                     </Link>
 
                     <button
@@ -205,16 +190,16 @@ const HomeNavbar = () => {
             <div className="flex items-center gap-2.5">
               <Link
                 href="/app?state=login"
-                className="nav-cta-ghost px-4 py-1.5 text-xs font-bold hover:text-brand-600 transition-colors cursor-pointer"
+                className="px-4 py-1.5 text-xs font-bold text-body hover:text-ink transition-colors cursor-pointer"
               >
                 Login
               </Link>
               <Link
                 href="/app?state=register"
-                className="nav-cta-primary group px-4.5 py-2 text-xs font-bold flex items-center gap-1.5 bg-slate-800 text-white rounded-full transition-all hover:bg-slate-700 active:scale-95 shadow-md cursor-pointer"
+                className="flex items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-4.5 py-2 text-xs font-bold transition-colors cursor-pointer"
               >
-                <span>Build Resume</span>
-                <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                <span>Build resume</span>
+                <ArrowRight className="size-3.5" />
               </Link>
             </div>
           )}
@@ -225,14 +210,14 @@ const HomeNavbar = () => {
           <ThemeToggle />
           <button
             onClick={() => setMenuOpen((o) => !o)}
-            className="relative z-10 flex size-10 items-center justify-center rounded-xl border border-line bg-surface text-body transition-all duration-200 hover:border-brand-500/30 hover:text-ink"
+            className="relative z-10 flex size-10 items-center justify-center rounded-xl border border-line bg-surface text-body transition-colors hover:text-ink"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
           >
-            <span className={`absolute transition-all duration-200 ${menuOpen ? "opacity-100 rotate-0" : "opacity-0 rotate-90"}`}>
+            <span className={`absolute transition-opacity ${menuOpen ? "opacity-100" : "opacity-0"}`}>
               <X size={19} />
             </span>
-            <span className={`absolute transition-all duration-200 ${menuOpen ? "opacity-0 -rotate-90" : "opacity-100 rotate-0"}`}>
+            <span className={`absolute transition-opacity ${menuOpen ? "opacity-0" : "opacity-100"}`}>
               <Menu size={19} />
             </span>
           </button>
@@ -250,14 +235,13 @@ const HomeNavbar = () => {
       )}
 
       {/* ── Mobile drawer ─────────────────────────────────────────── */}
+      {menuOpen && (
       <div
-        className={`fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-canvas/98 backdrop-blur-2xl transition-all duration-300 ease-out md:hidden ${
-          menuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
-        }`}
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-canvas border-l border-line md:hidden"
       >
         <button
           onClick={() => setMenuOpen(false)}
-          className="absolute right-5 top-5 flex size-10 items-center justify-center rounded-xl border border-line bg-surface text-body transition-all hover:border-brand-500/30 hover:text-ink"
+          className="absolute right-5 top-5 flex size-10 items-center justify-center rounded-xl border border-line bg-surface text-body transition-colors hover:text-ink"
           aria-label="Close menu"
         >
           <X size={19} />
@@ -267,29 +251,19 @@ const HomeNavbar = () => {
           <Logo size="md" variant="auto" />
         </Link>
 
-        <motion.div
-          initial="hidden"
-          animate={menuOpen ? "visible" : "hidden"}
-          variants={{ visible: { transition: { staggerChildren: 0.06 } }, hidden: {} }}
-          className="flex w-full flex-col items-center gap-1 px-8"
-        >
+        <div className="flex w-full flex-col items-center gap-1 px-8">
           {NAV_LINKS.map((l) => (
-            <motion.a
+            <a
               key={l.label}
               href={l.href}
               onClick={() => setMenuOpen(false)}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 24 }}
-              className="w-full rounded-xl px-6 py-3.5 text-center font-medium text-body transition-all duration-200 hover:scale-105 hover:bg-ink/5 hover:text-ink"
+              className="w-full rounded-xl px-6 py-3.5 text-center font-medium text-body transition-colors hover:bg-ink/5 hover:text-ink"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "1.1rem", letterSpacing: "-0.01em" }}
             >
               {l.label}
-            </motion.a>
+            </a>
           ))}
-        </motion.div>
+        </div>
 
         <div className="flex w-full flex-col items-center gap-3 px-8 pt-2">
           {user ? (
@@ -297,7 +271,7 @@ const HomeNavbar = () => {
               <Link
                 href="/app"
                 onClick={() => setMenuOpen(false)}
-                className="nav-cta-primary w-full max-w-xs justify-center py-3.5"
+                className="flex w-full max-w-xs items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3.5 text-sm font-bold transition-colors"
               >
                 Dashboard <ArrowRight className="size-4" />
               </Link>
@@ -306,7 +280,7 @@ const HomeNavbar = () => {
                   setMenuOpen(false);
                   handleLogout();
                 }}
-                className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-all hover:border-brand-500/20 hover:text-ink cursor-pointer"
+                className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-colors hover:text-ink cursor-pointer"
               >
                 Logout
               </button>
@@ -316,14 +290,14 @@ const HomeNavbar = () => {
               <Link
                 href="/app?state=register"
                 onClick={() => setMenuOpen(false)}
-                className="nav-cta-primary w-full max-w-xs justify-center py-3.5"
+                className="flex w-full max-w-xs items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3.5 text-sm font-bold transition-colors"
               >
-                Start Free <ArrowRight className="size-4" />
+                Start free <ArrowRight className="size-4" />
               </Link>
               <Link
                 href="/app?state=login"
                 onClick={() => setMenuOpen(false)}
-                className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-all hover:border-brand-500/20 hover:text-ink"
+                className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-colors hover:text-ink"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
                 Login
@@ -332,6 +306,7 @@ const HomeNavbar = () => {
           )}
         </div>
       </div>
+      )}
     </nav>
   );
 };

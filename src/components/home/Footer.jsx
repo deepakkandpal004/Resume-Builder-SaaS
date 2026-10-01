@@ -64,11 +64,11 @@ const Footer = () => {
             </p>
             <Link
               href="/app"
-              aria-label="Build Resume"
-              className="group inline-flex items-center gap-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white px-5 py-2 text-xs font-bold shadow-md hover:-translate-y-0.5 transition-all duration-200 transform-gpu"
+              aria-label="Build resume"
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 text-xs font-bold transition-colors"
             >
-              <span>Build Resume</span>
-              <ArrowRight className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+              <span>Build resume</span>
+              <ArrowRight className="size-3" />
             </Link>
           </div>
 
@@ -114,7 +114,7 @@ const Footer = () => {
                       rel="noopener noreferrer"
                       className="group inline-flex items-center gap-2.5 text-muted hover:text-brand-600 transition-colors"
                     >
-                      <div className="flex size-7 items-center justify-center rounded-lg border border-line bg-surface group-hover:border-brand-500/30 group-hover:bg-brand-500/10 transition-all duration-200">
+                      <div className="flex size-7 items-center justify-center rounded-lg border border-line bg-surface group-hover:border-brand-500/30 group-hover:bg-brand-500/10 transition-colors">
                         <Icon className="size-3.5" />
                       </div>
                       <span className="font-semibold">{s.label}</span>

@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 
     const quotaResult = await checkQuota(request, authResult.userId, "ats", 1);
     if (quotaResult.error) {
+      logger.error({ status: quotaResult.status, message: quotaResult.message }, "ATS quota check failed");
       return NextResponse.json({ message: quotaResult.message }, { status: quotaResult.status });
     }
 
@@ -72,10 +73,15 @@ export async function POST(request: NextRequest) {
     try {
       aiResponse = await getAI().chat.completions.create(
         {
-          model: GROQ_MODEL as any,
-          messages: messages as any,
-          response_format: { type: "json_object" },
-        },
+          model: GROQ_MODEL,
+          messages,
+          // NOTE: gpt-oss models on Groq reject response_format json_object with 400.
+          // The system prompt already enforces JSON-only output and parseAtsResponse strips fences.
+          // reasoning_effort "low" stops the model from burning its token budget on
+          // chain-of-thought (previously returned empty content with finish_reason "length").
+          reasoning_effort: "low",
+          max_completion_tokens: 4096,
+        } as any,
         { signal: controller.signal }
       );
       clearTimeout(timeoutId);
@@ -84,6 +90,7 @@ export async function POST(request: NextRequest) {
       if (err.name === "AbortError" || err.code === "ABORT_ERR" || err.message?.includes("abort")) {
         return NextResponse.json({ message: "Analysis timed out. Please try again." }, { status: 504 });
       }
+      logger.error({ status: err?.status, message: err?.message }, "ATS AI call failed");
       return NextResponse.json({ message: "AI scoring service is temporarily unavailable. Please try again." }, { status: 503 });
     }
 
@@ -93,7 +100,16 @@ export async function POST(request: NextRequest) {
       parsed = parseAtsResponse(rawContent);
     } catch (err: any) {
       if (err instanceof AtsParseError) {
-        logger.error({ contentPreview: String(rawContent).slice(0, 500) }, "ATS parse error");
+        const dbgMsg: any = (aiResponse as any)?.choices?.[0]?.message || {};
+        logger.error(
+          {
+            contentPreview: String(rawContent).slice(0, 500),
+            finishReason: (aiResponse as any)?.choices?.[0]?.finish_reason,
+            hasReasoningContent: Boolean(dbgMsg.reasoning_content),
+            reasoningPreview: String(dbgMsg.reasoning_content || "").slice(0, 500),
+          },
+          "ATS parse error"
+        );
         if (err.message.includes("Invalid score")) {
           return NextResponse.json({ message: "AI returned an invalid score. Please try again." }, { status: 500 });
         }

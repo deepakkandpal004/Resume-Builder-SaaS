@@ -1,13 +1,11 @@
 "use client";
 import { Loader2, Sparkles } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import api from "@/lib/config/apiClient";
 import { toast } from 'react-hot-toast'
 
 const ProfessionalSummary = ({data, onChange}) => {
 
-  const {token} = useSelector((state) => state.auth);
   const [isGenerating, setIsGenerating] = useState(false);
   const textareaRef = useRef(null);
 
@@ -22,7 +20,7 @@ const ProfessionalSummary = ({data, onChange}) => {
     try {
       setIsGenerating(true);
       const prompt = `enhance my professional summary: "${data}"`
-      const response = await api.post(`/api/ai/enhance-pro-sum`, {userContent: prompt}, {headers: { Authorization: `Bearer ${token}` },});
+      const response = await api.post(`/api/ai/enhance-pro-sum`, {userContent: prompt});
       onChange(response.data.enhancedContent || "");
       toast.success("Summary enhanced!");
     } catch (error) {
@@ -59,7 +57,7 @@ const ProfessionalSummary = ({data, onChange}) => {
         default:
           promptText = `enhance this summary: "${data}"`;
       }
-      const response = await api.post(`/api/ai/enhance-pro-sum`, { userContent: promptText }, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.post(`/api/ai/enhance-pro-sum`, { userContent: promptText });
       onChange(response.data.enhancedContent || "");
       toast.success("Summary updated with AI!");
     } catch (error) {

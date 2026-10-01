@@ -1,24 +1,16 @@
 "use client";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const CallToAction = () => {
-  void motion;
-  const ref = useScrollReveal();
-
   return (
     <section id="cta" className="relative overflow-hidden px-6 py-28 md:px-10">
       <div className="section-line absolute top-0 inset-x-0" />
 
-      <div ref={ref} className="mx-auto max-w-6xl reveal">
-        <div className="relative overflow-hidden rounded-3xl px-8 py-24 text-center sm:px-16">
-          <div className="absolute inset-0 bg-surface/80 dark:bg-surface/40" />
-          <div className="absolute inset-0 rounded-3xl border border-line bg-surface/60 backdrop-blur-sm dark:bg-transparent dark:border-line/30" />
-
+      <div className="mx-auto max-w-6xl">
+        <div className="rounded-3xl border border-line bg-surface px-8 py-24 text-center sm:px-16">
           <div className="relative">
-            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm font-medium text-brand-600 dark:text-emerald-300 dark:border-white/20 dark:bg-white/10 backdrop-blur-sm">
+            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-sm font-medium text-brand-600 dark:text-emerald-300 dark:border-white/20 dark:bg-white/10">
                 <span>Start with the document you already have</span>
             </div>
 
@@ -37,17 +29,17 @@ const CallToAction = () => {
               <Link
                 href="/app"
                 aria-label="Build my resume"
-                className="group btn-primary px-10 py-4 text-base shadow-xl hover:-translate-y-0.5 transition-all duration-250 ease-out transform-gpu flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-brand-500 outline-none"
+                className="flex items-center justify-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 text-base transition-colors focus-visible:ring-2 focus-visible:ring-brand-500 outline-none"
               >
                 <span>Build my resume</span>
-                <ArrowRight className="size-4 transition-transform duration-250 ease-out transform-gpu group-hover:translate-x-0.5" />
+                <ArrowRight className="size-4" />
               </Link>
               <a
                 href="#templates"
-                aria-label="View Templates"
-                className="btn-outline px-10 py-4 text-base hover:-translate-y-0.5 transition-all duration-250 ease-out transform-gpu flex items-center justify-center gap-1.5 focus-visible:ring-2 focus-visible:ring-brand-500 outline-none"
+                aria-label="View templates"
+                className="flex items-center justify-center gap-1.5 rounded-full border border-line bg-surface text-body px-10 py-4 text-base transition-colors hover:border-emerald-600/40 hover:text-ink focus-visible:ring-2 focus-visible:ring-brand-500 outline-none"
               >
-                <span>View Templates</span>
+                <span>View templates</span>
               </a>
             </div>
           </div>

@@ -155,6 +155,7 @@ ${jobDescription}`;
       lettersRemainingToday,
     });
   } catch (error: any) {
+    console.error("[Cover Letter] generation failed:", error?.status, error?.message);
     return handleAIError(error);
   }
 }
