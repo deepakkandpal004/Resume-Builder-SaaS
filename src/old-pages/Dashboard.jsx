@@ -19,6 +19,8 @@ import {
   Layout,
   Download,
   Briefcase,
+  Link2,
+  Unlink,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -205,6 +207,55 @@ const Dashboard = () => {
     } catch (error) {
       toast.error(error?.response?.data?.message || error.message);
     }
+  };
+
+  const shareLinkFor = (resumeId) => `${window.location.origin}/view/${resumeId}`;
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        return true;
+      } catch {
+        return false;
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+  };
+
+  const enableSharing = async (r) => {
+    try {
+      await api.post("/api/resumes/share", { resumeId: r._id, share: true });
+      setAllResumes((prev) => prev.map((x) => (x._id === r._id ? { ...x, public: true } : x)));
+      const ok = await copyText(shareLinkFor(r._id));
+      toast.success(ok ? "Sharing on, link copied" : "Sharing on");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    }
+  };
+
+  const disableSharing = async (r) => {
+    try {
+      await api.post("/api/resumes/share", { resumeId: r._id, share: false });
+      setAllResumes((prev) => prev.map((x) => (x._id === r._id ? { ...x, public: false } : x)));
+      toast.success("Sharing turned off");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message);
+    }
+  };
+
+  const copyShareLink = async (r) => {
+    const ok = await copyText(shareLinkFor(r._id));
+    if (ok) toast.success("Link copied");
+    else toast.error("Could not copy link");
   };
 
   useEffect(() => {
@@ -548,6 +599,9 @@ const Dashboard = () => {
                           <p className="truncate text-xs font-bold text-ink leading-tight">{r.title}</p>
                           <div className="flex items-center gap-1.5 flex-wrap mt-1">
                             <span className="rounded-full bg-line/20 px-1.5 py-0.5 text-[9px] font-bold text-muted border border-line/50">{templateLabel}</span>
+                            {r.public && (
+                              <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 border border-emerald-500/30">Shared</span>
+                            )}
                             <span className="text-[9px] font-semibold text-muted">{timeAgo(r.updatedAt)}</span>
                           </div>
                         </div>
@@ -594,6 +648,14 @@ const Dashboard = () => {
                                   {[
                                     { label: "Edit Resume", icon: PencilIcon, color: "hover:text-emerald-600", action: () => router.push(`/app/builder/${r._id}`) },
                                     { label: "Track Application", icon: Briefcase, color: "hover:text-emerald-600", action: () => router.push(`/app/applications?resumeId=${r._id}`) },
+                                    ...(r.public
+                                      ? [
+                                          { label: "Copy share link", icon: Link2, color: "hover:text-emerald-600", action: () => copyShareLink(r) },
+                                          { label: "Turn off sharing", icon: Unlink, color: "hover:text-amber-600", action: () => disableSharing(r) },
+                                        ]
+                                      : [
+                                          { label: "Share via link", icon: Link2, color: "hover:text-emerald-600", action: () => enableSharing(r) },
+                                        ]),
                                     { label: "Duplicate", icon: Copy, color: "hover:text-teal-600", action: () => duplicateResume(r._id) },
                                     { label: "Rename", icon: FileTextIcon, color: "hover:text-purple-600", action: () => { setEditResumeId(r._id); setTitle(r.title); } },
                                     { label: "Download PDF", icon: Download, color: "hover:text-blue-600", action: () => router.push(`/view/${r._id}`) },
@@ -658,6 +720,12 @@ const Dashboard = () => {
                           <span className="font-bold">{templateLabel}</span>
                           <span>·</span>
                           <span className="font-semibold">{timeAgo(r.updatedAt)}</span>
+                          {r.public && (
+                            <>
+                              <span>·</span>
+                              <span className="font-bold text-emerald-600">Shared</span>
+                            </>
+                          )}
                         </div>
                       </div>
                       
@@ -699,6 +767,14 @@ const Dashboard = () => {
                                   {[
                                     { label: "Edit Resume", icon: PencilIcon, color: "hover:text-emerald-600", action: () => router.push(`/app/builder/${r._id}`) },
                                     { label: "Track Application", icon: Briefcase, color: "hover:text-emerald-600", action: () => router.push(`/app/applications?resumeId=${r._id}`) },
+                                    ...(r.public
+                                      ? [
+                                          { label: "Copy share link", icon: Link2, color: "hover:text-emerald-600", action: () => copyShareLink(r) },
+                                          { label: "Turn off sharing", icon: Unlink, color: "hover:text-amber-600", action: () => disableSharing(r) },
+                                        ]
+                                      : [
+                                          { label: "Share via link", icon: Link2, color: "hover:text-emerald-600", action: () => enableSharing(r) },
+                                        ]),
                                     { label: "Duplicate", icon: Copy, color: "hover:text-teal-600", action: () => duplicateResume(r._id) },
                                     { label: "Rename", icon: FileTextIcon, color: "hover:text-purple-600", action: () => { setEditResumeId(r._id); setTitle(r.title); } },
                                     { label: "Download PDF", icon: Download, color: "hover:text-blue-600", action: () => router.push(`/view/${r._id}`) },
