@@ -1,39 +1,25 @@
 "use client";
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Mail, ArrowRight } from "lucide-react";
+import { Github, Twitter, Linkedin } from "lucide-react";
 import Logo from "../Logo";
 
-const sections = [
+const columns = [
   {
     title: "Product",
     links: [
-      { label: "Resume Builder", href: "/app" },
+      { label: "Resume builder", href: "/app" },
+      { label: "Resume matcher", href: "/app/matcher" },
       { label: "Templates", href: "#templates" },
-      { label: "Resume Writer", href: "/app" },
-      { label: "ATS Checker", href: "/app" },
-      { label: "Resume Examples", href: "#templates" },
+      { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "Blog", href: "#" },
-      { label: "Career Tips", href: "#" },
-      { label: "Interview Guide", href: "#" },
-      { label: "FAQ", href: "#faq" },
-      { label: "Documentation", href: "#" },
-      { label: "Help Center", href: "#" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About", href: "#" },
+      { label: "How it works", href: "#how-it-works" },
+      { label: "FAQ", href: "#faq" },
       { label: "Contact", href: "#cta" },
-      { label: "Privacy", href: "#" },
-      { label: "Terms", href: "#" },
-      { label: "Cookie Policy", href: "#" },
     ],
   },
 ];
@@ -42,54 +28,44 @@ const socialLinks = [
   { icon: Github, href: "https://github.com/deepakkandpal004", label: "GitHub" },
   { icon: Twitter, href: "https://x.com/deepakkandpal", label: "Twitter/X" },
   { icon: Linkedin, href: "https://linkedin.com/in/deepakkandpal", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:deepak@example.com", label: "Email" },
 ];
 
 const Footer = () => {
   return (
-    <footer className="relative overflow-hidden border-t border-line px-6 pt-16 pb-8 md:px-10">
-
-      <div className="relative mx-auto max-w-7xl">
-        
-        {/* 5-Column Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 items-start pb-12">
-          
-          {/* Brand Column */}
-          <div className="col-span-2 md:col-span-1 flex flex-col items-start gap-4">
-            <Link href="/" aria-label="Resume Builder Home">
-              <Logo size="md" />
+    <footer className="border-t border-line px-6 pt-10 pb-6 md:px-10">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid grid-cols-2 gap-8 pb-8 md:grid-cols-5">
+          {/* Brand */}
+          <div className="col-span-2 flex flex-col items-start gap-3">
+            <Link href="/" aria-label="ResumeAI home">
+              <Logo size="sm" />
             </Link>
-            <p className="text-xs leading-relaxed text-body font-semibold max-w-xs text-left">
-              Create professional resumes that help you land your next role. Free to get started with no watermarks.
+            <p className="max-w-xs text-xs leading-relaxed text-body">
+              Match your resume to the job, tailor it to the role, and track
+              every application in one workspace.
             </p>
-            <Link
-              href="/app"
-              aria-label="Build resume"
-              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 text-xs font-bold transition-colors"
-            >
-              <span>Build resume</span>
-              <ArrowRight className="size-3" />
-            </Link>
           </div>
 
-          {/* Product, Resources, Company columns */}
-          {sections.map((section) => (
-            <div key={section.title} className="text-left">
-              <p className="text-sm font-bold text-ink/75 uppercase tracking-wider">{section.title}</p>
-              <ul className="mt-4 space-y-2.5 text-xs sm:text-sm">
-                {section.links.map((link) => (
+          {/* Link columns */}
+          {columns.map((col) => (
+            <div key={col.title}>
+              <p className="text-xs font-bold uppercase tracking-wider text-ink/70">
+                {col.title}
+              </p>
+              <ul className="mt-3 space-y-2 text-xs sm:text-sm">
+                {col.links.map((link) => (
                   <li key={link.label}>
                     {link.href.startsWith("#") ? (
                       <a
                         href={link.href}
-                        className="text-muted font-semibold transition hover:text-brand-600"
+                        className="font-semibold text-muted transition hover:text-brand-600"
                       >
                         {link.label}
                       </a>
                     ) : (
                       <Link
                         href={link.href}
-                        className="text-muted font-semibold transition hover:text-brand-600"
+                        className="font-semibold text-muted transition hover:text-brand-600"
                       >
                         {link.label}
                       </Link>
@@ -100,10 +76,12 @@ const Footer = () => {
             </div>
           ))}
 
-          {/* Connect (Social Links Column) */}
-          <div className="text-left">
-            <p className="text-sm font-bold text-ink/75 uppercase tracking-wider">Connect</p>
-            <ul className="mt-4 space-y-3.5 text-xs sm:text-sm">
+          {/* Social */}
+          <div className="col-span-2 md:col-span-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-ink/70">
+              Connect
+            </p>
+            <ul className="mt-3 space-y-2.5 text-xs sm:text-sm">
               {socialLinks.map((s) => {
                 const Icon = s.icon;
                 return (
@@ -112,11 +90,11 @@ const Footer = () => {
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-2.5 text-muted hover:text-brand-600 transition-colors"
+                      className="group inline-flex items-center gap-2 text-muted transition-colors hover:text-brand-600"
                     >
-                      <div className="flex size-7 items-center justify-center rounded-lg border border-line bg-surface group-hover:border-brand-500/30 group-hover:bg-brand-500/10 transition-colors">
-                        <Icon className="size-3.5" />
-                      </div>
+                      <span className="flex size-6 items-center justify-center rounded-md border border-line bg-surface transition-colors group-hover:border-brand-500/30 group-hover:bg-brand-500/10">
+                        <Icon className="size-3" />
+                      </span>
                       <span className="font-semibold">{s.label}</span>
                     </a>
                   </li>
@@ -124,28 +102,21 @@ const Footer = () => {
               })}
             </ul>
           </div>
-
         </div>
 
-        {/* Bottom Copyright & Status Bar */}
-        <div className="relative border-t border-line/45 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-muted select-none">
-          <div>
-            &copy; {new Date().getFullYear()} Resume Builder. Made with ❤️ using React.
-          </div>
-          <div className="flex items-center flex-wrap gap-4">
-            <Link href="#" className="hover:text-brand-600 transition-colors">Privacy Policy</Link>
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-line/50 pt-5 text-xs font-semibold text-muted sm:flex-row">
+          <p>&copy; {new Date().getFullYear()} ResumeAI. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <a href="#faq" className="transition-colors hover:text-brand-600">
+              FAQ
+            </a>
             <span className="text-line">|</span>
-            <Link href="#" className="hover:text-brand-600 transition-colors">Terms of Service</Link>
-            <span className="text-line">|</span>
-            <span className="text-[10.5px]">Version 1.0.0</span>
-            <span className="text-line">|</span>
-            <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[10px]">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>System Operational</span>
-            </div>
+            <a href="#cta" className="transition-colors hover:text-brand-600">
+              Contact
+            </a>
           </div>
         </div>
-
       </div>
     </footer>
   );

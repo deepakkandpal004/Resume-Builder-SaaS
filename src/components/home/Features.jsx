@@ -1,137 +1,145 @@
 "use client";
-import React from "react";
-import {
-  Lightbulb,
-  BarChart3,
-  LayoutTemplate,
-  Eye,
-  ScanLine,
-  Link as LinkIcon,
-  FileText,
-  MessageSquare,
-  ArrowRight,
-} from "lucide-react";
-import Title from "./Title";
+import { useState } from "react";
 import Link from "next/link";
-const RouterLink = Link;
+import { ArrowRight, Plus } from "lucide-react";
+import Reveal from "./Reveal";
+
+/*
+  Features as an interactive index: numbered full-width rows.
+  Click a row to expand its description — quiet, editorial, no cards.
+*/
 
 const features = [
   {
-    icon: Lightbulb,
-    title: "Smart bullet rewriting",
-    desc: "Rewrite bullet points with stronger action verbs, tailored to the job.",
-    featured: true,
+    title: "Resume matcher",
+    desc: "Paste a job description or link. Your resumes get ranked by fit, with matched and missing skills.",
+    tag: "Start here",
   },
   {
-    icon: BarChart3,
+    title: "Tailor to JD",
+    desc: "Rewrite your summary, experience bullets, and skills for a specific role. You review every change.",
+  },
+  {
+    title: "Application tracker",
+    desc: "Track every application from applied to offer, with notes, history, and response stats.",
+  },
+  {
     title: "ATS score checker",
-    desc: "Check keyword gaps and compatibility against a job post.",
+    desc: "Check keyword gaps and compatibility against a job post before you apply.",
   },
   {
-    icon: LayoutTemplate,
-    title: "Professional templates",
-    desc: "Clean layout templates built for fast reading.",
-  },
-  {
-    icon: Eye,
-    title: "Live resume preview",
-    desc: "See layout changes update in real time before exporting to PDF.",
-  },
-  {
-    icon: MessageSquare,
     title: "Cover letter generator",
     desc: "Draft a cover letter matched to the role in one click.",
   },
   {
-    icon: ScanLine,
-    title: "Background removal",
-    desc: "Remove the background from your profile photo.",
+    title: "Interview prep",
+    desc: "Role-specific questions with suggested answers, across behavioural and technical rounds.",
   },
   {
-    icon: LinkIcon,
     title: "Shareable resume links",
-    desc: "Host your resume and share a public link with hiring teams.",
+    desc: "Share a public link that always shows your latest version. Turn it off anytime.",
   },
   {
-    icon: FileText,
+    title: "Professional templates",
+    desc: "Clean layouts recruiters can scan in seconds.",
+  },
+  {
     title: "PDF import and export",
-    desc: "Import an existing resume or export a print-ready PDF.",
+    desc: "Import an existing resume or export a print-ready one-page PDF.",
   },
 ];
 
-const Features = () => {
+export default function Features() {
+  const [open, setOpen] = useState(0);
+
   return (
-    <section id="features" className="relative overflow-hidden px-6 py-28 md:px-10">
-      <div className="section-line absolute top-0 inset-x-0" />
-
+    <section id="features" className="px-6 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
-        
-        {/* Header Badge & Title */}
-        <div className="flex flex-col items-center text-center">
-          <Title
-            title="Tools for the parts of a job application that take the most care"
-            description="Bring your resume, target role, writing, and final export into one focused workspace."
-          />
-        </div>
+        <Reveal>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
+            Features
+          </p>
+          <h2 className="mt-3 max-w-xl text-3xl font-bold tracking-tight text-ink md:text-4xl">
+            More than a resume builder
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-body">
+            Matching, tailoring, tracking, and interview prep live alongside
+            the editor.
+          </p>
+        </Reveal>
 
-        {/* Features Card Grid */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full">
-          {features.map((f) => {
-            const Icon = f.icon;
-            const isFeatured = f.featured;
-            
+        <div className="mt-12 border-b border-line">
+          {features.map((f, i) => {
+            const isOpen = open === i;
             return (
-              <div
-                key={f.title}
-                className={`relative rounded-[14px] border bg-surface p-7 min-h-[200px] flex flex-col transition-colors ${
-                  isFeatured 
-                    ? "border-emerald-500/35" 
-                    : "border-line/70 hover:border-emerald-500/40"
-                }`}
-              >
-                <div>
-                  
-                  {/* Top Header Row with Icon and Badge */}
-                  <div className="flex items-start justify-between mb-6">
-                    
-                    {/* Icon container */}
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-                      <Icon className="size-5.5" />
+              <Reveal key={f.title} delay={Math.min(i, 5) * 40}>
+                <div className="border-t border-line">
+                  <button
+                    type="button"
+                    onClick={() => setOpen(isOpen ? -1 : i)}
+                    aria-expanded={isOpen}
+                    className="group flex w-full items-center gap-5 py-5 text-left md:gap-8 md:py-6"
+                  >
+                    <span
+                      className={`w-8 shrink-0 text-sm font-bold tabular-nums transition-colors ${
+                        isOpen ? "text-brand-600" : "text-ink/30"
+                      }`}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="flex flex-1 flex-wrap items-center gap-3">
+                      <span
+                        className={`text-base font-bold transition-all duration-300 group-hover:translate-x-1 md:text-lg ${
+                          isOpen ? "text-brand-700" : "text-ink"
+                        }`}
+                      >
+                        {f.title}
+                      </span>
+                      {f.tag && (
+                        <span className="rounded-full bg-brand-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-700">
+                          {f.tag}
+                        </span>
+                      )}
+                    </span>
+                    <Plus
+                      className={`size-5 shrink-0 transition-transform duration-300 ${
+                        isOpen
+                          ? "rotate-45 text-brand-600"
+                          : "text-ink/40 group-hover:text-ink"
+                      }`}
+                    />
+                  </button>
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${
+                      isOpen
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="max-w-2xl pb-6 pl-13 text-sm leading-relaxed text-body md:pl-16 md:text-[15px]">
+                        {f.desc}
+                      </p>
                     </div>
-
                   </div>
-
-                  {/* Title & Description */}
-                  <h3 className="text-base font-bold text-ink">
-                    {f.title}
-                  </h3>
-                  <p className="mt-3 text-xs leading-relaxed text-body line-clamp-2">
-                    {f.desc}
-                  </p>
                 </div>
-
-              </div>
+              </Reveal>
             );
           })}
         </div>
 
-        {/* Bottom CTA Block */}
-        <div className="mt-14 flex flex-col items-center justify-center text-center space-y-3.5">
-          <RouterLink
-            href="/app"
-            className="btn-primary px-8 py-3.5 flex items-center gap-2 font-bold cursor-pointer"
-            style={{ minHeight: "2.75rem" }}
-          >
-            <Lightbulb className="size-4" />
-            <span>See it in action</span>
-            <ArrowRight className="size-4" />
-          </RouterLink>
-        </div>
+        <Reveal delay={100}>
+          <div className="mt-14">
+            <Link
+              href="/app/matcher"
+              className="group inline-flex items-center gap-2 rounded-full border border-line bg-surface px-8 py-4 text-base font-semibold text-ink transition hover:border-ink/30 active:scale-[0.98]"
+            >
+              Try the matcher
+              <ArrowRight className="size-5 transition group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </Reveal>
       </div>
-
-      <div className="section-line absolute bottom-0 inset-x-0" />
     </section>
   );
-};
-
-export default Features;
+}

@@ -1,6 +1,7 @@
 "use client";
-import { LayoutTemplate, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Reveal from "./Reveal";
 import { useRouter } from "next/navigation";
 import ClassicTemplate from "../templates/ClassicTemplate";
 import ModernTemplate from "../templates/ModernTemplate";
@@ -77,26 +78,30 @@ const TemplateShowcase = () => {
 
       <div className="mx-auto max-w-7xl">
         {/* Header Block */}
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-50 px-4 py-1.5 text-xs font-bold text-accent-700 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-accent-400">
-            <LayoutTemplate className="size-4 text-brand-500" />
-            <span>Templates</span>
-          </div>
-          <h2 className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl lg:text-6xl leading-[1.15] max-w-3xl mx-auto">
+        <Reveal>
+        <div className="max-w-2xl">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
+            Templates
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-ink md:text-4xl">
             Professional templates that pass ATS scans
           </h2>
+          <p className="mt-3 text-sm leading-relaxed text-body">
+            Six layouts, one click to switch — your content stays intact and the PDF export is print-ready.
+          </p>
         </div>
+        </Reveal>
 
         {/* Grid Container */}
         <div
           className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch"
         >
-          {templates.map((t) => {
+          {templates.map((t, i) => {
             const Template = t.component;
 
             return (
+              <Reveal key={t.id} delay={Math.min(i, 5) * 70} className="h-full">
               <div
-                key={t.id}
                 className="h-full"
               >
                 <div
@@ -110,7 +115,7 @@ const TemplateShowcase = () => {
                     }
                   }}
                   aria-label={`Use ${t.name} Template`}
-                  className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-colors cursor-pointer outline-none hover:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500"
+                  className="fx-tilt group relative flex flex-col h-full overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-colors cursor-pointer outline-none hover:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500"
                 >
                   {/* Top Color Line */}
                   <div
@@ -187,20 +192,23 @@ const TemplateShowcase = () => {
 
                 </div>
               </div>
+              </Reveal>
             );
           })}
         </div>
 
         {/* Global CTA Bottom */}
+        <Reveal delay={100}>
         <div className="mt-14 flex flex-col items-center gap-3">
           <Link
             href="/app"
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3.5 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3.5 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition active:scale-[0.98]"
           >
             <span>Explore all templates</span>
             <ArrowRight className="size-4" />
           </Link>
         </div>
+        </Reveal>
       </div>
 
       <div className="section-line absolute bottom-0 inset-x-0" />

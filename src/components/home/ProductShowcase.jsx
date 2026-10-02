@@ -1,341 +1,466 @@
 "use client";
-import React, { useState } from "react";
-import { FileText, Lightbulb, LayoutDashboard, BarChart3 } from "lucide-react";
+import { Check, ArrowRight, ChevronDown } from "lucide-react";
+import Reveal from "./Reveal";
+import ClassicTemplate from "../templates/ClassicTemplate";
+import ModernTemplate from "../templates/ModernTemplate";
+import MinimalTemplate from "../templates/MinimalTemplate";
+import ExecutiveTemplate from "../templates/ExecutiveTemplate";
+import CreativeTemplate from "../templates/CreativeTemplate";
+import CompactTemplate from "../templates/CompactTemplate";
+import { dummyResumeData } from "@/assets/assets";
 
-const TABS = [
-  { id: "builder", label: "Resume builder", icon: FileText },
-  { id: "ai", label: "Writing review", icon: Lightbulb },
-  { id: "templates", label: "Templates", icon: LayoutDashboard },
-  { id: "ats", label: "Role review", icon: BarChart3 },
-];
+/*
+  Product tour as a detailed walkthrough, not tabs.
+  Each feature gets its own row: what it does in plain words,
+  three concrete points, and the screen itself.
+*/
 
-const BrowserChrome = ({ children, savedTime, statusText }) => (
-  <div className="overflow-hidden rounded-2xl border border-line bg-surface relative">
-    {/* Browser header bar */}
-    <div className="flex items-center justify-between border-b border-line px-4 py-3 bg-line/10">
-      <div className="flex items-center gap-2">
-        {/* macOS traffic lights */}
-        <span className="size-2.5 rounded-full bg-red-400/60" />
-        <span className="size-2.5 rounded-full bg-yellow-400/60" />
-        <span className="size-2.5 rounded-full bg-emerald-400/60" />
-        <span className="ml-3 rounded-md bg-canvas border border-line px-3 py-0.5 text-[10px] text-muted font-semibold tracking-wide">
-          app.resumebuilder.io/editor
-        </span>
+/* ---------- screen visuals (sample data) ---------- */
+
+/* Mirrors the real builder: step nav on the left, live template preview on the right. */
+const BuilderVisual = () => {
+  const data = dummyResumeData[0];
+  const steps = [
+    "Personal Info",
+    "Summary",
+    "Experience",
+    "Education",
+    "Projects",
+    "Skills",
+  ];
+  const tools = ["ATS Score", "Tailor to JD", "Cover Letter"];
+  return (
+    <div className="flex min-h-[420px] bg-canvas">
+      <div className="w-40 shrink-0 border-r border-line bg-surface p-3 sm:w-44">
+        <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted">
+          Content
+        </p>
+        {steps.map((s, i) => (
+          <div
+            key={s}
+            className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs ${
+              i === 2
+                ? "bg-emerald-500/10 font-semibold text-emerald-700"
+                : "text-body"
+            }`}
+          >
+            {i < 2 ? (
+              <Check className="size-3 shrink-0 text-emerald-500" />
+            ) : i === 2 ? (
+              <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" />
+            ) : (
+              <span className="size-1.5 shrink-0 rounded-full bg-line" />
+            )}
+            <span className="truncate">{s}</span>
+          </div>
+        ))}
+        <p className="px-2 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-muted">
+          Tools
+        </p>
+        {tools.map((t) => (
+          <div
+            key={t}
+            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-body"
+          >
+            <span className="size-1.5 shrink-0 rounded-full bg-line" />
+            <span className="truncate">{t}</span>
+          </div>
+        ))}
       </div>
-      <div className="flex items-center gap-2 text-[10px] font-semibold text-muted">
-        <span className="size-1.5 rounded-full bg-emerald-500" />
-        <span>{statusText || "Draft"}</span>
-        <span className="text-line">•</span>
-        <span>Saved {savedTime || "just now"}</span>
+      <div className="min-w-0 flex-1 p-4">
+        <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-wider text-muted">
+          Live preview
+        </p>
+        <div className="relative h-80 overflow-hidden rounded-lg border border-line bg-white">
+          <div
+            style={{
+              transform: "scale(0.32)",
+              width: "312.5%",
+              transformOrigin: "top left",
+            }}
+          >
+            <ModernTemplate
+              data={data}
+              accentColor="#10b981"
+              styleOptions={{
+                fontSize: 11,
+                lineSpacing: 1.3,
+                pageSize: "letter",
+              }}
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
+        </div>
       </div>
     </div>
+  );
+};
+
+/* Mirrors the real tailor panel: toolbar + diff cards with Before/After. */
+const TailorVisual = () => (
+  <div className="min-h-[420px] space-y-3 bg-canvas p-6">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <p className="flex items-center gap-2 text-sm font-medium text-ink">
+        <Check className="size-4 text-teal-500" />
+        Tailored for this role
+      </p>
+      <span className="rounded-lg bg-brand-600 px-4 py-1.5 text-xs font-medium text-white">
+        Apply to Resume
+      </span>
+    </div>
+
+    <div className="overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="flex items-center gap-2 p-4">
+        <span className="size-2 shrink-0 rounded-full bg-teal-500" />
+        <span className="truncate text-sm font-medium text-ink">
+          Professional Summary
+        </span>
+        <span className="hidden text-xs text-muted sm:inline">
+          — 4 new keywords added
+        </span>
+      </div>
+      <div className="border-t border-line">
+        <div className="p-4">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-rose-500">
+            Before
+          </p>
+          <p className="text-sm leading-relaxed text-body">
+            MERN developer with 2 years of experience building dashboards
+            and REST APIs.
+          </p>
+        </div>
+        <div className="border-t border-line bg-teal-50/50 p-4">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-teal-600">
+            After
+          </p>
+          <p className="text-sm leading-relaxed text-teal-800">
+            MERN developer with 2 years of experience building scalable
+            dashboards and REST APIs, with Redis caching and Docker-based
+            deployments.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {[
+      { label: "Skills", summary: "3 new skills added" },
+      { label: "Experience", summary: "2 entries updated" },
+    ].map((c) => (
+      <div
+        key={c.label}
+        className="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface p-4"
+      >
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="size-2 shrink-0 rounded-full bg-teal-500" />
+          <span className="truncate text-sm font-medium text-ink">
+            {c.label}
+          </span>
+          <span className="hidden text-xs text-muted sm:inline">
+            — {c.summary}
+          </span>
+        </div>
+        <ChevronDown className="size-4 shrink-0 text-muted" />
+      </div>
+    ))}
+
+    <p className="pt-1 text-center text-[11px] font-semibold text-muted">
+      Every suggestion shows before and after — nothing changes without your
+      approval.
+    </p>
+  </div>
+);
+
+/* Mirrors the real ATS results panel: Score Summary + Keywords sections. */
+const AtsVisual = () => {
+  const stats = [
+    { value: "77", label: "Score", color: "text-brand-600" },
+    { value: "30", label: "Matched", color: "text-green-600" },
+    { value: "5", label: "Missing", color: "text-red-500" },
+    { value: "8", label: "Gaps", color: "text-amber-500" },
+  ];
+  return (
+    <div className="min-h-[420px] space-y-4 bg-canvas p-6">
+      <p className="text-xs text-muted">Last analyzed: 2 hours ago</p>
+
+      <div className="overflow-hidden rounded-xl border border-line bg-surface">
+        <p className="border-b border-line px-4 py-3 text-sm font-semibold text-ink">
+          Score Summary
+        </p>
+        <div className="flex flex-wrap items-center gap-4 p-4">
+          <div className="relative size-24 shrink-0">
+            <svg viewBox="0 0 96 96" className="size-24 -rotate-90">
+              <circle
+                cx="48"
+                cy="48"
+                r="40"
+                fill="none"
+                strokeWidth="10"
+                stroke="var(--line)"
+              />
+              <circle
+                cx="48"
+                cy="48"
+                r="40"
+                fill="none"
+                strokeWidth="10"
+                strokeLinecap="round"
+                className="stroke-brand-600"
+                strokeDasharray={`${0.77 * 251.3} 251.3`}
+              />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-ink">
+              77
+            </span>
+          </div>
+          <div className="flex flex-1 flex-wrap gap-2">
+            {stats.map((s) => (
+              <div
+                key={s.label}
+                className="flex min-w-[68px] flex-1 flex-col items-center rounded-lg border border-line bg-canvas px-3 py-2.5"
+              >
+                <span className={`text-xl font-bold ${s.color}`}>
+                  {s.value}
+                </span>
+                <span className="mt-0.5 text-xs text-muted">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-end border-t border-line p-3">
+          <span className="rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white">
+            Create tailored draft
+          </span>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-line bg-surface">
+        <p className="border-b border-line px-4 py-3 text-sm font-semibold text-ink">
+          Keywords
+        </p>
+        <div className="grid gap-4 p-4 sm:grid-cols-2">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-green-700">
+              Matched: 4
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {["React", "Node.js", "REST APIs", "MongoDB"].map((k) => (
+                <span
+                  key={k}
+                  className="rounded-full border border-green-200 bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700"
+                >
+                  {k}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-red-700">
+              Missing: 2
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {["Docker", "Redis"].map((k) => (
+                <span
+                  key={k}
+                  className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700"
+                >
+                  {k}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* Real template renders, scaled down — the same components the app uses. */
+const tourTemplates = [
+  { name: "Modern", accent: "#10b981", component: ModernTemplate },
+  { name: "Classic", accent: "#6366f1", component: ClassicTemplate },
+  { name: "Minimal", accent: "#2dd4bf", component: MinimalTemplate },
+  { name: "Executive", accent: "#2563EB", component: ExecutiveTemplate },
+  { name: "Creative", accent: "#E11D48", component: CreativeTemplate },
+  { name: "Compact", accent: "#D97706", component: CompactTemplate },
+];
+
+const TemplatesVisual = () => {
+  const data = dummyResumeData[0];
+  return (
+    <div className="bg-canvas p-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {tourTemplates.map((t) => {
+          const Template = t.component;
+          return (
+            <div
+              key={t.name}
+              className="overflow-hidden rounded-xl border border-line bg-surface"
+            >
+              <div className="relative h-44 overflow-hidden bg-white">
+                <div
+                  className="origin-top-left"
+                  style={{
+                    transform: "scale(0.32)",
+                    width: "312.5%",
+                    transformOrigin: "top left",
+                  }}
+                >
+                  <Template
+                    data={data}
+                    accentColor={t.accent}
+                    styleOptions={{
+                      fontSize: 11,
+                      lineSpacing: 1.3,
+                      pageSize: "letter",
+                    }}
+                  />
+                </div>
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
+              </div>
+              <p className="border-t border-line px-3 py-2 text-xs font-bold text-ink">
+                {t.name}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+      <p className="pt-5 text-center text-[11px] font-semibold text-muted">
+        Switch templates anytime — your content stays intact.
+      </p>
+    </div>
+  );
+};
+
+const ScreenPanel = ({ children }) => (
+  <div className="fx-panel overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_24px_60px_-32px_rgba(6,78,59,0.18)]">
     {children}
   </div>
 );
 
+const features = [
+  {
+    n: "01",
+    name: "Resume builder",
+    tagline: "A guided builder, not a blank canvas.",
+    desc: "Fourteen steps take you from personal info to interview prep. Every step pairs a focused form with a live preview, so you always see exactly what a recruiter will see, and a completion tracker shows what is left.",
+    bullets: [
+      "Live preview with zoom — switch templates and accent colors without losing content",
+      "Import your existing PDF and keep editing from there",
+      "One-click export to a print-ready one-page PDF",
+    ],
+    visual: <BuilderVisual />,
+  },
+  {
+    n: "02",
+    name: "Tailor to JD",
+    tagline: "Rewrite for the role. Approve every line.",
+    desc: "Paste any job description, or just the job link. The tailor rewrites your summary, experience bullets, and skills to match the role, and shows each suggestion as a before-and-after diff. Coming from the matcher, the JD arrives prefilled.",
+    bullets: [
+      "Before-and-after diffs for summary, bullets, and skills",
+      "Every change needs your approval — nothing is rewritten silently",
+      "One click in the matcher sends the JD straight into the tailor",
+    ],
+    visual: <TailorVisual />,
+  },
+  {
+    n: "03",
+    name: "ATS checker",
+    tagline: "Know your score before you apply.",
+    desc: "Paste the job description and get an ATS compatibility score with the exact gaps spelled out. See which required keywords you already cover and which ones you are missing, then close the gaps before the application goes out.",
+    bullets: [
+      "A score out of 100 with a breakdown you can act on",
+      "Missing and covered keywords, mapped to the actual job post",
+      "Re-check after tailoring to watch the score climb",
+    ],
+    visual: <AtsVisual />,
+  },
+  {
+    n: "04",
+    name: "Templates",
+    tagline: "Six layouts. Zero rework.",
+    desc: "Switch between six professional layouts in one click — your content, section order, and styling choices stay exactly as they were. Every template uses clean, parser-friendly structure, and the PDF export is print-ready.",
+    bullets: [
+      "One-click switching with content fully preserved",
+      "Parser-friendly structure built for ATS software",
+      "Template and accent-color controls right in the builder",
+    ],
+    visual: <TemplatesVisual />,
+  },
+];
+
 const ProductShowcase = () => {
-  const [activeTab, setActiveTab] = useState("builder");
-
-  // Template State
-  const [selectedTemplate, setSelectedTemplate] = useState("Modern");
-
-  const handleTabClick = (tabId) => {
-    setActiveTab(tabId);
-  };
-
   return (
-    <section id="product-showcase" className="relative overflow-hidden px-6 py-28 md:px-10">
-      <div className="section-line absolute top-0 inset-x-0" />
+    <section
+      id="product-showcase"
+      className="relative overflow-hidden px-6 py-20 md:px-10 md:py-28"
+    >
+      <div className="section-line absolute inset-x-0 top-0" />
 
       <div className="mx-auto max-w-7xl">
-        
-        {/* Outcome-driven header block */}
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-xs font-bold text-muted dark:text-accent-400">
-            <LayoutDashboard className="size-4" />
-            <span>Product showcase</span>
-          </div>
-          <h2 className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl lg:text-6xl leading-[1.1] max-w-4xl">
-            Everything happens in one workspace
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-body font-medium">
-            Edit, rewrite, score, and export — no switching between tools, so you can focus on landing interviews.
+        <Reveal>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
+            Product tour
           </p>
+          <h2 className="mt-3 max-w-xl text-3xl font-bold tracking-tight text-ink md:text-4xl">
+            Every screen, explained
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-body">
+            What each part of the workspace does, in plain words. Sample
+            data shown throughout.
+          </p>
+        </Reveal>
 
-          {/* Minimal Feature pills */}
-          <div className="mt-6 flex flex-wrap justify-center gap-2.5 max-w-2xl">
-            {[
-              { label: "Live preview" },
-              { label: "Smart rewrite" },
-              { label: "ATS templates" },
-              { label: "ATS checker" },
-              { label: "Export PDF" }
-            ].map((pill) => (
-              <span
-                key={pill.label}
-                className="px-3.5 py-1.5 rounded-full text-[10.5px] font-bold border border-line bg-surface text-ink flex items-center gap-1.5"
-              >
-                {pill.label}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Selection */}
-        <div className="mt-10 max-w-5xl mx-auto px-0 sm:px-4">
-          <div className="flex flex-wrap justify-center gap-2 rounded-2xl border border-line bg-surface p-1.5">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabClick(tab.id)}
-                  className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-colors relative cursor-pointer ${
-                    isActive
-                      ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                      : "text-muted hover:text-ink"
-                  }`}
-                >
-                  <Icon className="size-4" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Browser Demonstration Window Wrapper */}
-          <div className="mt-10 relative">
-            
-            {/* Main Browser Mockup Container */}
-            <div className="rounded-2xl border border-line bg-surface shadow-sm">
-              <BrowserChrome 
-                savedTime="your changes"
-                statusText="Workspace preview"
-              >
-                <div className="flex h-[380px] overflow-hidden bg-canvas">
-                  
-                  {/* Mockup Sidebar */}
-                  <div className="hidden w-40 border-r border-line bg-surface p-4.5 sm:block space-y-4">
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase font-bold text-muted tracking-widest">Workspace</span>
-                      <div className="h-7.5 rounded-lg bg-brand-500/10 text-brand-600 flex items-center px-2.5 gap-2 text-xs font-bold border border-brand-500/20">
-                        <FileText className="size-3.5" />
-                        <span>My resumes</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase font-bold text-muted tracking-widest">Analytics</span>
-                      <div className="h-7.5 rounded-lg hover:bg-line/40 text-muted flex items-center px-2.5 gap-2 text-xs font-bold transition-colors">
-                        <BarChart3 className="size-3.5" />
-                        <span>ATS Audit</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Left Workspace Panel (Editor or Stats side) */}
-                  <div className="flex-1 p-5 overflow-y-auto border-r border-line bg-surface">
-                    <>
-                      
-                      {/* 1. Builder Editor Simulator */}
-                      {activeTab === "builder" && (
-                        <div key="builder-left" className="space-y-3.5">
-                          <div className="space-y-1">
-                            <label className="text-[9.5px] uppercase font-bold text-muted">Full name</label>
-                            <div className="h-9 rounded-lg border border-line bg-surface px-3 flex items-center text-xs text-ink font-semibold">
-                              Jordan Lee
-                            </div>
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9.5px] uppercase font-bold text-muted">Target position</label>
-                            <div className="h-9 rounded-lg border border-brand-500/30 bg-surface px-3 flex items-center text-xs text-brand-600 font-bold">
-                              <span>Product Designer</span>
-                            </div>
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9.5px] uppercase font-bold text-muted">Professional experience</label>
-                            <div className="rounded-lg border border-line bg-surface p-3 text-xs text-muted leading-relaxed font-semibold h-24">
-                              Developed scalable SaaS applications using React and Node.js. Optimized database metrics to improve core LCP.
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 2. AI Optimization Step Flow */}
-                      {activeTab === "ai" && (
-                        <div key="ai-left" className="space-y-4">
-                          <div className="flex items-center gap-3 p-3.5 rounded-xl border border-brand-500/25 bg-brand-500/[0.04]">
-                            <Lightbulb className="size-5 text-brand-500" />
-                            <div>
-                              <h4 className="text-xs font-bold text-ink">Writing review</h4>
-                              <p className="text-[10px] text-muted">Review a suggested rewrite before applying it to your resume.</p>
-                            </div>
-                          </div>
-
-                          {/* Rewrite comparison card */}
-                          <div className="space-y-3 p-4 rounded-xl border border-line bg-surface">
-                            <div>
-                              <span className="text-[8.5px] uppercase font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">Weak description</span>
-                              <p className="text-xs text-muted mt-2 font-semibold">"I helped speed up database queries."</p>
-                            </div>
-
-                            <div className="h-px bg-line/65" />
-
-                            <div>
-                              <span className="text-[8.5px] uppercase font-bold text-brand-600 bg-brand-500/10 px-2 py-0.5 rounded flex items-center gap-1.5 w-fit">
-                                <span>Suggested rewrite</span>
-                              </span>
-                              <p className="text-xs text-ink mt-2 font-bold leading-relaxed">
-                                <span>"Improved database query performance with indexed keys."</span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 3. Templates Showcase Toggles */}
-                      {activeTab === "templates" && (
-                        <div key="templates-left" className="space-y-3">
-                          <span className="text-[9.5px] uppercase font-bold text-muted tracking-wider">Select layout template</span>
-                          <div className="grid grid-cols-2 gap-2.5">
-                            {["Modern", "Professional", "Minimal", "Executive"].map((template) => {
-                              const isSel = selectedTemplate === template;
-                              return (
-                                <div
-                                  key={template}
-                                  onClick={() => setSelectedTemplate(template)}
-                                  className={`p-3 rounded-xl border cursor-pointer text-left transition-colors ${
-                                    isSel 
-                                      ? "border-brand-500 bg-brand-500/[0.04]" 
-                                      : "border-line bg-surface hover:border-brand-500/30"
-                                }`}
-                              >
-                                <span className="text-xs font-bold text-ink block">{template}</span>
-                                <span className="text-[9.5px] text-muted mt-0.5 block">
-                                  {template === "Modern" ? "Trendy grid" : template === "Professional" ? "Corporate layout" : "Clean design"}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 4. ATS Match Audit Metrics */}
-                    {activeTab === "ats" && (
-                      <div key="ats-left" className="space-y-4">
-                        <span className="text-[9.5px] uppercase font-bold text-muted tracking-wider block">ATS compliance analysis</span>
-                        
-                        {/* Match metrics progress list */}
-                        <div className="space-y-3">
-                          {[
-                            { name: "Required terms", status: "Review" , width: "72%" },
-                            { name: "Relevant experience", status: "Review", width: "58%" },
-                            { name: "Readable structure", status: "Present", width: "86%" },
-                          ].map((item) => (
-                            <div key={item.name} className="space-y-1">
-                              <div className="flex items-center justify-between text-[11px] font-bold text-ink">
-                                <span>{item.name}</span>
-                                <span>{item.status}</span>
-                              </div>
-                              <div className="h-1.5 w-full bg-line rounded-full overflow-hidden">
-                                <div
-                                  style={{ width: item.width }}
-                                  className="h-full bg-brand-500"
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Keyword tags pills mapping */}
-                        <div className="pt-2">
-                          <span className="text-[10px] font-bold text-muted block mb-1.5">Terms found in the draft</span>
-                          <div className="flex flex-wrap gap-1">
-                            {["React", "Node.js", "TypeScript", "Indexed DB", "AWS"].map((tag) => (
-                              <span key={tag} className="px-2 py-0.5 text-[9.5px] font-bold bg-emerald-500/10 text-emerald-600 rounded">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                  </>
+        <div className="mt-16 space-y-20 md:space-y-24">
+          {features.map((f, i) => (
+            <Reveal key={f.n}>
+              <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <div className={i % 2 === 1 ? "lg:order-2" : ""}>
+                  <p className="text-xs font-extrabold tracking-widest text-brand-600">
+                    {f.n}
+                  </p>
+                  <h3 className="mt-2 text-2xl font-bold text-ink">{f.name}</h3>
+                  <p className="mt-1 text-sm font-semibold text-brand-700">
+                    {f.tagline}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-body">
+                    {f.desc}
+                  </p>
+                  <ul className="mt-5 space-y-2.5">
+                    {f.bullets.map((b) => (
+                      <li
+                        key={b}
+                        className="flex items-start gap-2.5 text-sm text-body"
+                      >
+                        <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                {/* Right Document A4 Live Preview Mockup */}
-                <div className="w-56 p-5 flex flex-col justify-center bg-line/20 relative">
-                  
-                  <div className="text-[8px] font-bold uppercase tracking-wider text-muted mb-2 text-center">Live preview</div>
-
-                  {/* Document sheet */}
-                  <div className="flex-1 bg-white border border-line rounded-lg p-4 shadow-sm flex flex-col justify-between text-left relative overflow-hidden">
-                    
-                    {/* Template styles adjustments preview based on selection tab */}
-                    <div className={`space-y-3.5 h-full flex flex-col justify-between ${
-                      selectedTemplate === "Professional" ? "font-serif text-gray-800" : "font-sans text-slate-800"
-                    }`}>
-                      
-                      {/* Name header */}
-                      <div className="space-y-1 text-center">
-                        <div className="text-[12px] font-extrabold tracking-tight text-slate-900 leading-none">Jordan Lee</div>
-                        <div className="text-[8px] font-bold text-brand-600 flex items-center justify-center gap-0.5">
-                          <span>Product Designer</span>
-                        </div>
-                      </div>
-
-                      {/* Work summary block */}
-                      <div className="space-y-1.5">
-                        <div className="h-0.5 w-full bg-slate-200" />
-                        <div className="h-1 w-10 bg-slate-300 rounded-xs" />
-                        <p className="text-[6.5px] text-slate-500 leading-relaxed font-semibold">
-                          <span>Improved the onboarding flow and documented reusable interface patterns.</span>
-                        </p>
-                      </div>
-
-                      {/* Experience outline block */}
-                      <div className="space-y-1.5 flex-1 pt-1.5 justify-center flex flex-col">
-                        <div className="h-1 w-12 bg-slate-300 rounded-xs" />
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-[6px] font-bold text-slate-700">
-                            <span>SaaS Platform Architect</span>
-                            <span className="text-slate-400">2024 - Present</span>
-                          </div>
-                          <div className="h-0.5 w-full bg-slate-100 rounded-xs" />
-                          <div className="h-0.5 w-11/12 bg-slate-100 rounded-xs" />
-                        </div>
-                      </div>
-
-                      {/* Footer tags */}
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                        <span className="text-[5.5px] font-bold text-slate-400">Page 1 of 1</span>
-                        <div className="flex items-center gap-1 rounded bg-brand-500/10 px-1.5 py-0.5">
-                          <span className="size-1 rounded-full bg-brand-500" />
-                          <span className="text-[6px] text-brand-600 font-bold">Role review pending</span>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
+                <div className={i % 2 === 1 ? "lg:order-1" : ""}>
+                  <ScreenPanel>{f.visual}</ScreenPanel>
                 </div>
-
               </div>
-            </BrowserChrome>
-          </div>
+            </Reveal>
+          ))}
         </div>
 
+        <Reveal delay={100}>
+          <div className="mt-20 flex justify-center">
+            <a
+              href="/app"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-emerald-700 active:scale-[0.98]"
+            >
+              <span>Open the workspace</span>
+              <ArrowRight className="size-4" />
+            </a>
+          </div>
+        </Reveal>
       </div>
-    </div>
 
-    <div className="section-line absolute bottom-0 inset-x-0" />
-  </section>
-);
+      <div className="section-line absolute inset-x-0 bottom-0" />
+    </section>
+  );
 };
 
 export default ProductShowcase;

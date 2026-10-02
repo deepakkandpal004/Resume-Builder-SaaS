@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {
-  Sparkles,
   Loader2,
   ArrowLeft,
   ArrowRight,
@@ -137,11 +136,7 @@ const Matcher = () => {
             disabled={!jdText.trim() || matching}
             className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {matching ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Sparkles className="size-4" />
-            )}
+            {matching && <Loader2 className="size-4 animate-spin" />}
             {matching ? "Matching…" : "Find best match"}
           </button>
         </div>

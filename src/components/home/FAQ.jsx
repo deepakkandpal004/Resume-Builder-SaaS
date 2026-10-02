@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { ChevronDown, HelpCircle } from "lucide-react";
-import Title from "./Title";
+import { ChevronDown } from "lucide-react";
+import Reveal from "./Reveal";
 
 const faqs = [
+  { q: "How does the resume matcher work?", a: "Paste a job description or a job link. The matcher scores each of your resumes for fit and shows matched and missing skills, so you know which resume to send — then tailor it in the builder with one click." },
   { q: "Is the resume builder free?", a: "Yes. The free tier includes all templates, customization, PDF export, and limited rewriting features. No credit card required." },
   { q: "What features are included?", a: "You can rewrite bullets, improve summaries, suggest skills, score your resume, tailor it to roles, and generate cover letters or interview questions." },
   { q: "Can I import my existing resume?", a: "Yes. Upload a PDF and the app turns it into editable content so you can keep building from there." },
@@ -20,19 +21,23 @@ const FAQ = () => {
       <div className="section-line absolute top-0 inset-x-0" />
 
       <div className="mx-auto max-w-3xl">
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-50 px-4 py-1.5 text-sm font-medium text-accent-700 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-accent-400">
-            <HelpCircle className="size-4" />
-            FAQs
-          </div>
-          <Title
-            title="Common questions, answered quickly"
-            description="How the product works, what is included, and what Pro adds."
-          />
+        <Reveal>
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
+            FAQ
+          </p>
+          <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold tracking-tight text-ink md:text-4xl">
+            Common questions, answered quickly
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-body">
+            How the product works, what is included, and what Pro adds.
+          </p>
         </div>
+        </Reveal>
 
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => (
+            <Reveal key={i} delay={Math.min(i, 4) * 50}>
             <div
               key={i}
               className={`overflow-hidden rounded-2xl border transition-colors ${
@@ -49,18 +54,27 @@ const FAQ = () => {
                 >
                   <span className="font-bold text-ink pr-4 text-sm sm:text-base">{faq.q}</span>
                   <ChevronDown
-                    className={`size-5 shrink-0 text-muted ${
+                    className={`size-5 shrink-0 text-muted transition-transform duration-300 ${
                       openIndex === i ? "rotate-180 text-brand-500" : ""
                     }`}
                   />
                 </button>
               </h3>
-              {openIndex === i && (
-                <p className="border-t border-line/45 px-6 py-5 text-xs sm:text-sm leading-relaxed text-body font-medium">
-                  {faq.a}
-                </p>
-              )}
+              <div
+                className={`grid transition-all duration-300 ease-in-out ${
+                  openIndex === i
+                    ? "grid-rows-[1fr] opacity-100"
+                    : "grid-rows-[0fr] opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <p className="border-t border-line/45 px-6 py-5 text-xs sm:text-sm leading-relaxed text-body font-medium">
+                    {faq.a}
+                  </p>
+                </div>
+              </div>
             </div>
+            </Reveal>
           ))}
         </div>
       </div>

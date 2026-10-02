@@ -2,6 +2,7 @@
 import { lazy, Suspense } from "react";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Hero from "@/components/home/Hero";
+import Statement from "@/components/home/Statement";
 import HowItWorks from "@/components/home/HowItWorks";
 
 // Lazy load below-the-fold components
@@ -15,11 +16,12 @@ const Footer = lazy(() => import("../components/home/Footer"));
 
 const Home = () => {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-canvas text-body">
+    <div className="landing-page relative min-h-screen overflow-hidden bg-canvas text-body">
       <HomeNavbar />
 
       <main className="relative">
         <Hero />
+        <Statement />
         <HowItWorks />
         
         <Suspense fallback={<div className="h-[500px]" />}>
