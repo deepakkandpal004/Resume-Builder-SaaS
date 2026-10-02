@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
-import ThemeToggle from "@/components/ThemeToggle";
 import { setUser } from "@/lib/store/features/authSlice";
 import { auth, googleProvider } from "@/lib/config/firebaseClient";
 import { setCachedToken } from "@/lib/config/apiClient";
@@ -195,8 +194,6 @@ const Login = () => {
       animate={{ opacity: 1 }}
       className="relative flex min-h-screen items-center justify-center bg-canvas px-4 py-12"
     >
-      <ThemeToggle className="absolute right-6 top-6" />
-
       <AnimatePresence mode="wait">
         {forgotMode ? (
           <motion.div

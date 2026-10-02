@@ -71,7 +71,6 @@ import CertificationForm from "@/components/CertificationForm";
 import LanguageForm from "@/components/LanguageForm";
 import VersionHistoryPanel from "@/components/VersionHistoryPanel";
 import ResumePreview from "@/components/ResumePreview";
-import ThemeToggle from "@/components/ThemeToggle";
 import { getCompleteness, getCompletenessColor } from "@/utils/completeness";
 import useKeyboardShortcuts from "@/hooks/useKeyboardShortcuts";
 import useUnsavedChangesWarning from "@/hooks/useUnsavedChangesWarning";
@@ -960,7 +959,6 @@ const ResumeBuilder = () => {
               <History className="size-4" />
             </button>
             
-            <ThemeToggle className="size-8 rounded-lg border border-line bg-surface text-muted hover:bg-canvas hover:text-ink" />
             
             <span className="text-line select-none font-light">|</span>
             

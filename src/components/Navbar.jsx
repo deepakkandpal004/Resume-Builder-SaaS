@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { logout } from "@/lib/store/features/authSlice";
 import { LogOut, Sparkles, Zap, Settings, BadgeCheck, Briefcase } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/config/firebaseClient";
@@ -108,9 +107,6 @@ const Navbar = () => {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          {/* Theme toggle */}
-          <ThemeToggle className="bg-surface hover:border-brand-500/30" />
-
           {/* User pill with dropdown */}
           <div className="relative" ref={menuRef}>
             <button

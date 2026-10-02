@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X, ArrowRight, BadgeCheck } from "lucide-react";
 import Logo from "../Logo";
-import ThemeToggle from "../ThemeToggle";
 import { logout } from "@/lib/store/features/authSlice";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/config/firebaseClient";
@@ -128,11 +127,8 @@ const HomeNavbar = () => {
           })}
         </div>
 
-        {/* Desktop CTAs & Theme Toggle */}
+        {/* Desktop CTAs */}
         <div className="hidden items-center gap-3.5 md:flex">
-          {/* Theme Toggle */}
-          <ThemeToggle className="mr-1" />
-
           {user ? (
             <div className="flex items-center gap-3.5">
               <Link
@@ -205,9 +201,8 @@ const HomeNavbar = () => {
           )}
         </div>
 
-        {/* Mobile menu trigger + Theme Toggle */}
+        {/* Mobile menu trigger */}
         <div className="flex items-center gap-2 md:hidden">
-          <ThemeToggle />
           <button
             onClick={() => setMenuOpen((o) => !o)}
             className="relative z-10 flex size-10 items-center justify-center rounded-xl border border-line bg-surface text-body transition-colors hover:text-ink"
