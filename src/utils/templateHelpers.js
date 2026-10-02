@@ -6,6 +6,7 @@
 // Maps stored fontFamily value → CSS font-family string
 export const FONT_FAMILY_MAP = {
   inter:          "Inter, sans-serif",
+  spacegrotesk:   "'Space Grotesk', sans-serif",
   georgia:        "Georgia, serif",
   merriweather:   "Merriweather, serif",
   courier:        "'Courier New', monospace",

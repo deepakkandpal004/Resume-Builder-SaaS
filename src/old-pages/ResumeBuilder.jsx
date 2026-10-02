@@ -153,11 +153,30 @@ const SectionForm = memo(({ section, resumeData, onChange, resumeId, removeBackg
         );
       case "styles":
         return (
-          <StylesPanel
-            styleOptions={resumeData.style_options}
-            onChange={(so) => onChange((prev) => ({ ...prev, style_options: so }))}
-            resumeData={resumeData}
-          />
+          <div className="space-y-6">
+            {/* Template + accent for mobile (header only shows these on md+) */}
+            <div className="space-y-4 pb-5 border-b border-line md:hidden">
+              <div>
+                <h4 className="text-sm font-semibold text-body mb-2">Template</h4>
+                <TemplateSelector
+                  selectedTemplate={resumeData.template}
+                  onChange={(t) => setResumeData((prev) => ({ ...prev, template: t }))}
+                />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-body mb-2">Accent color</h4>
+                <ColorPicker
+                  selectedColor={resumeData.accent_color}
+                  onChange={(c) => setResumeData((prev) => ({ ...prev, accent_color: c }))}
+                />
+              </div>
+            </div>
+            <StylesPanel
+              styleOptions={resumeData.style_options}
+              onChange={(so) => onChange((prev) => ({ ...prev, style_options: so }))}
+              resumeData={resumeData}
+            />
+          </div>
         );
       case "ats":
         return (
@@ -305,6 +324,12 @@ const ResumeBuilder = () => {
           custom_sections: data.resume.custom_sections ?? [],
           certifications: data.resume.certifications ?? [],
           languages: data.resume.languages ?? [],
+          personal_info: data.resume.personal_info ?? {},
+          professional_summary: data.resume.professional_summary ?? "",
+          experience: data.resume.experience ?? [],
+          education: data.resume.education ?? [],
+          project: data.resume.project ?? [],
+          skills: data.resume.skills ?? [],
           style_options: {
             fontFamily: "inter",
             fontSize: 14,
@@ -661,7 +686,7 @@ const ResumeBuilder = () => {
       handleExportPDF();
     },
     'mod+p': () => {
-      setIsMobilePreview(true);
+      setIsMobilePreview((v) => !v);
     },
     'mod+z': () => {
       handleUndo();
@@ -731,7 +756,6 @@ const ResumeBuilder = () => {
   ];
 
   const { score: completenessScore, missing: completenessMissing } = getCompleteness(resumeData);
-  getCompletenessColor(completenessScore);
 
   const [showHealthPanel, setShowHealthPanel] = useState(false);
 
@@ -790,7 +814,13 @@ const ResumeBuilder = () => {
   };
 
   const sectionHasData = (section) => {
-    const val = resumeData[section.id];
+    // Sidebar section ids differ from resumeData keys for these three.
+    const keyMap = {
+      personal: "personal_info",
+      summary: "professional_summary",
+      projects: "project",
+    };
+    const val = resumeData[keyMap[section.id] ?? section.id];
     if (Array.isArray(val)) return val.length > 0;
     if (typeof val === "string") return val.length > 30;
     if (typeof val === "object" && val) return Object.keys(val).length > 1;
@@ -827,7 +857,7 @@ const ResumeBuilder = () => {
                 Save failed
               </span>
             )}
-            {autoSaveStatus === "idle" && (
+            {autoSaveStatus === "idle" && hasUnsavedChanges && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 dark:bg-zinc-900 text-[10px] font-bold text-muted border border-line">
                 <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
                 <span>Unsaved changes</span>

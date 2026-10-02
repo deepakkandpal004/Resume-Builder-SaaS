@@ -28,6 +28,21 @@ export async function POST(request: NextRequest) {
     const authResult = await protect(request);
     if (authResult instanceof NextResponse) return authResult;
 
+    // Validate input BEFORE touching quota — bad input must not burn quota.
+    let body: any;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+    }
+    const { resumeText, title } = body ?? {};
+    if (!resumeText || (typeof resumeText === "string" && resumeText.trim() === "")) {
+      return NextResponse.json({ message: "Resume text is required" }, { status: 400 });
+    }
+    if (typeof resumeText !== "string" || resumeText.length > 20000) {
+      return NextResponse.json({ message: "resumeText must be a string of at most 20,000 characters." }, { status: 400 });
+    }
+
     const quotaResult = await checkQuota(request, authResult.userId, "uploadResume", 10);
     if (quotaResult.error) {
       return NextResponse.json({ message: quotaResult.message }, { status: quotaResult.status });
@@ -36,14 +51,6 @@ export async function POST(request: NextRequest) {
     const userId = await getMongoUserId(authResult.userId);
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const { resumeText, title } = await request.json();
-    if (!resumeText || resumeText.trim() === "") {
-      return NextResponse.json({ message: "Resume text is required" }, { status: 400 });
-    }
-    if (typeof resumeText !== "string" || resumeText.length > 20000) {
-      return NextResponse.json({ message: "resumeText must be a string of at most 20,000 characters." }, { status: 400 });
     }
 
     const systemPrompt =
