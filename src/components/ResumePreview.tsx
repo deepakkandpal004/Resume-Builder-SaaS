@@ -7,17 +7,13 @@ import MinimalImageTemplate from "./templates/MinimalImageTemplate";
 import ExecutiveTemplate from "./templates/ExecutiveTemplate";
 import CreativeTemplate from "./templates/CreativeTemplate";
 import CompactTemplate from "./templates/CompactTemplate";
-import type { StyleOptions } from "@/lib/utils/templateHelpers";
-
-interface PreviewStyleOptions extends StyleOptions {
-  pageSize?: string;
-}
+import type { ResumeData, StyleOptions } from "@/components/templates/templateTypes";
 
 interface ResumePreviewProps {
-  data: Record<string, unknown>;
-  template: string;
-  accentColor: string;
-  styleOptions?: PreviewStyleOptions;
+  data: ResumeData;
+  template?: string;
+  accentColor?: string;
+  styleOptions?: StyleOptions;
   classes?: string;
 }
 
@@ -54,7 +50,7 @@ const ResumePreview = ({ data, template, accentColor, styleOptions = {}, classes
         {renderTemplate()}
       </div>
 
-      <style jsx="true">
+      <style>
         {`
           @page {
             size: ${pageSize};

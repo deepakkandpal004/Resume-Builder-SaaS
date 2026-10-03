@@ -14,6 +14,8 @@ export interface StyleOptions {
   sectionOrder?: string[];
   photoEffect?: string;
   pageSize?: string;
+  dateFormat?: string;
+  sectionSpacing?: string;
 }
 
 export interface CustomSectionRef {

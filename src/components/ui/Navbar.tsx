@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     if (isBuilder) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node | null)) {
         setMenuOpen(false);
       }
     };

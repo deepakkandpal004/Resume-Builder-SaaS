@@ -12,7 +12,7 @@ interface ResumeVersionInfo {
 
 interface VersionHistoryPanelProps {
   resumeId: string;
-  onRestore: (resume: unknown) => void;
+  onRestore: (resume: any) => void;
   onClose: () => void;
 }
 

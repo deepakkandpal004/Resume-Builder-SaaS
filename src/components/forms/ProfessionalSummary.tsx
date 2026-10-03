@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast'
 const ProfessionalSummary: React.FC<ProfessionalSummaryProps> = ({data, onChange}) => {
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const textareaRef = useRef(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -24,7 +24,7 @@ const ProfessionalSummary: React.FC<ProfessionalSummaryProps> = ({data, onChange
       const response = await api.post(`/api/ai/enhance-pro-sum`, {userContent: prompt});
       onChange(response.data.enhancedContent || "");
       toast.success("Summary enhanced!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message);
     } finally {
       setIsGenerating(false);
@@ -61,7 +61,7 @@ const ProfessionalSummary: React.FC<ProfessionalSummaryProps> = ({data, onChange
       const response = await api.post(`/api/ai/enhance-pro-sum`, { userContent: promptText });
       onChange(response.data.enhancedContent || "");
       toast.success("Summary updated with AI!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message);
     } finally {
       setIsGenerating(false);

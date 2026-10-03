@@ -117,7 +117,7 @@ interface SectionFormProps {
   onChange: React.Dispatch<React.SetStateAction<BuilderResumeData>>;
   resumeId: string;
   removeBackground: boolean;
-  setRemoveBackground: (v: boolean) => void;
+  setRemoveBackground: React.Dispatch<React.SetStateAction<boolean>>;
   loadExistingResume: () => Promise<void>;
   setActiveSectionIndex: (i: number) => void;
 }
@@ -214,14 +214,14 @@ const SectionForm = memo(({ section, resumeData, onChange, resumeId, removeBackg
                 <h4 className="text-sm font-semibold text-body mb-2">Template</h4>
                 <TemplateSelector
                   selectedTemplate={resumeData.template}
-                  onChange={(t) => setResumeData((prev) => ({ ...prev, template: t }))}
+                  onChange={(t: string) => onChange((prev) => ({ ...prev, template: t }))}
                 />
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-body mb-2">Accent color</h4>
                 <ColorPicker
                   selectedColor={resumeData.accent_color}
-                  onChange={(c) => setResumeData((prev) => ({ ...prev, accent_color: c }))}
+                  onChange={(c: string) => onChange((prev) => ({ ...prev, accent_color: c }))}
                 />
               </div>
             </div>
@@ -242,7 +242,7 @@ const SectionForm = memo(({ section, resumeData, onChange, resumeId, removeBackg
               <ATS_Results_Panel
               resumeId={resumeId}
               resumeData={resumeData}
-              onNavigateTab={(tabIndex) => setActiveSectionIndex(tabIndex)}
+              onNavigateTab={(tabIndex: number) => setActiveSectionIndex(tabIndex)}
               onReloadResume={loadExistingResume}
             />
             </Suspense>
@@ -257,7 +257,7 @@ const SectionForm = memo(({ section, resumeData, onChange, resumeId, removeBackg
           <Suspense fallback={<div className="animate-pulse h-24 rounded-lg bg-line/30" />}>
           <TailorPanel
             resumeId={resumeId}
-            onApplyTailored={(patch) => {
+            onApplyTailored={(patch: any) => {
               onChange((prev) => {
                 const updated = { ...prev };
                 if (patch.professional_summary) updated.professional_summary = patch.professional_summary;
@@ -430,7 +430,7 @@ const ResumeBuilder: React.FC = () => {
         const img = resumeDataToSend.personal_info.image;
         if (img instanceof File) {
           formData.append("image", img);
-          formData.append("removeBackground", removeBackground);
+          formData.append("removeBackground", String(removeBackground));
           resumeDataToSend.personal_info.image = "";
         } else if (typeof img === "string" && img.includes("imagekit.io")) {
           let cleanUrl = img
@@ -450,7 +450,7 @@ const ResumeBuilder: React.FC = () => {
         }
       }
       resumeDataToSend.custom_sections = resumeDataToSend.custom_sections.filter(
-        (s) => s.heading.trim() !== "" || s.content.trim() !== ""
+        (s) => (s.heading || "").trim() !== "" || (s.content || "").trim() !== ""
       );
       formData.append("resumeData", JSON.stringify(resumeDataToSend));
 
@@ -503,7 +503,7 @@ const ResumeBuilder: React.FC = () => {
     const wrapper = original.parentElement;
     if (!wrapper) return;
 
-    const clone = wrapper.cloneNode(true);
+    const clone = wrapper.cloneNode(true) as HTMLElement;
     clone.style.position = "fixed";
     clone.style.left = "0";
     clone.style.top = "0";
@@ -511,7 +511,7 @@ const ResumeBuilder: React.FC = () => {
     clone.style.pointerEvents = "none";
     document.body.appendChild(clone);
 
-    const clonePreview = clone.querySelector("#resume-preview");
+    const clonePreview = clone.querySelector("#resume-preview") as HTMLElement | null;
     if (!clonePreview) {
       document.body.removeChild(clone);
       return;
@@ -531,7 +531,7 @@ const ResumeBuilder: React.FC = () => {
       // Long resumes: reflow text at a smaller base font so the content fits
       // one page at full width (no side margins). Template spacing uses em,
       // so everything scales proportionally.
-      const templateRoot = clonePreview.firstElementChild;
+      const templateRoot = clonePreview.firstElementChild as HTMLElement | null;
       if (templateRoot && clonePreview.scrollHeight > pagePxH) {
         let size = parseFloat(window.getComputedStyle(templateRoot).fontSize) || 14;
         templateRoot.style.lineHeight = "1.35";
@@ -548,7 +548,6 @@ const ResumeBuilder: React.FC = () => {
       const canvas = await html2canvas(clonePreview, {
         scale: 2,
         useCORS: true,
-        letterRendering: true,
       });
       const imgData = canvas.toDataURL("image/jpeg", 0.98);
 
@@ -625,13 +624,13 @@ const ResumeBuilder: React.FC = () => {
     if (!resumeData._id) return;
     setAutoSaveStatus("idle");
     setHasUnsavedChanges(true); // Mark as having unsaved changes
-    clearTimeout(autoSaveTimerRef.current);
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     const currentVersion = ++autoSaveVersionRef.current;
     autoSaveTimerRef.current = setTimeout(async () => {
       if (currentVersion !== autoSaveVersionRef.current) return;
       await performSave(true);
     }, 2500);
-    return () => clearTimeout(autoSaveTimerRef.current);
+    return () => { if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeData]);
 
@@ -875,7 +874,7 @@ const ResumeBuilder: React.FC = () => {
       summary: "professional_summary",
       projects: "project",
     };
-    const val = (resumeData as Record<string, unknown>)[keyMap[section.id] ?? section.id];
+    const val = (resumeData as unknown as Record<string, unknown>)[keyMap[section.id] ?? section.id];
     if (Array.isArray(val)) return val.length > 0;
     if (typeof val === "string") return val.length > 30;
     if (typeof val === "object" && val) return Object.keys(val).length > 1;
@@ -1018,11 +1017,11 @@ const ResumeBuilder: React.FC = () => {
             <div className="hidden md:flex items-center gap-2">
               <TemplateSelector
                 selectedTemplate={resumeData.template}
-                onChange={(t) => setResumeData((prev) => ({ ...prev, template: t }))}
+                onChange={(t: string) => setResumeData((prev) => ({ ...prev, template: t }))}
               />
               <ColorPicker
                 selectedColor={resumeData.accent_color}
-                onChange={(c) => setResumeData((prev) => ({ ...prev, accent_color: c }))}
+                onChange={(c: string) => setResumeData((prev) => ({ ...prev, accent_color: c }))}
               />
             </div>
             

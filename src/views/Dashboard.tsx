@@ -39,18 +39,19 @@ import MinimalImageTemplate from "@/components/templates/MinimalImageTemplate";
 
 interface ResumeSummary {
   _id: string;
-  title?: string;
-  template?: string;
+  title: string;
+  template: string;
   accent_color?: string;
   personal_info?: { full_name?: string };
   public?: boolean;
-  updatedAt?: string;
+  updatedAt: string;
   lastAts?: { atsScore?: number };
 }
 
 const getAtsColor = (score?: number) => {
-  if (score >= 75) return { bg: "bg-emerald-50 dark:bg-emerald-500/10", text: "text-emerald-700 dark:text-emerald-300" };
-  if (score >= 50) return { bg: "bg-amber-50 dark:bg-amber-500/10", text: "text-amber-700 dark:text-amber-300" };
+  const s = score ?? 0;
+  if (s >= 75) return { bg: "bg-emerald-50 dark:bg-emerald-500/10", text: "text-emerald-700 dark:text-emerald-300" };
+  if (s >= 50) return { bg: "bg-amber-50 dark:bg-amber-500/10", text: "text-amber-700 dark:text-amber-300" };
   return { bg: "bg-rose-50 dark:bg-rose-500/10", text: "text-rose-700 dark:text-rose-300" };
 };
 
@@ -60,13 +61,13 @@ const TEMPLATE_LABELS: Record<string, string> = {
   creative: "Creative", compact: "Compact",
 };
 
-const TEMPLATE_MAP: Record<string, React.ComponentType<TemplateProps>> = {
+const TEMPLATE_MAP: Record<string, React.ComponentType<any>> = {
   classic: ClassicTemplate, modern: ModernTemplate, minimal: MinimalTemplate,
   "minimal-image": MinimalImageTemplate, executive: ExecutiveTemplate,
   creative: CreativeTemplate, compact: CompactTemplate,
 };
 
-const timeAgo = (date?: string | number | Date) => {
+const timeAgo = (date: string | number | Date) => {
   const diff = Date.now() - new Date(date).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";
@@ -277,8 +278,8 @@ const Dashboard: React.FC = () => {
   const filtered = allResumes
     .filter((r) => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
-      if (sortBy === "newest") return new Date(b.updatedAt) - new Date(a.updatedAt);
-      if (sortBy === "oldest") return new Date(a.updatedAt) - new Date(b.updatedAt);
+      if (sortBy === "newest") return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      if (sortBy === "oldest") return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
       if (sortBy === "name-asc") return a.title.localeCompare(b.title);
       if (sortBy === "name-desc") return b.title.localeCompare(a.title);
       return 0;
@@ -297,11 +298,11 @@ const Dashboard: React.FC = () => {
   const totalResumes = allResumes.length;
   const resumesWithAts = allResumes.filter((r) => r.lastAts?.atsScore);
   const avgAts = resumesWithAts.length > 0 
-    ? Math.round(resumesWithAts.reduce((sum, r) => sum + r.lastAts.atsScore, 0) / resumesWithAts.length)
+    ? Math.round(resumesWithAts.reduce((sum, r) => sum + (r.lastAts?.atsScore ?? 0), 0) / resumesWithAts.length)
     : 0;
 
   const lastUpdatedResume = allResumes.length > 0
-    ? [...allResumes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0]
+    ? [...allResumes].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0]
     : null;
   const lastActiveStr = lastUpdatedResume ? timeAgo(lastUpdatedResume.updatedAt) : "N/A";
   const uniqueTemplatesCount = new Set(allResumes.map((r) => r.template || "classic")).size;
@@ -622,7 +623,7 @@ const Dashboard: React.FC = () => {
                       {/* Footer: ATS Score & Dropdown Menu */}
                       <div className="mt-2 flex items-center justify-between pt-2 border-t border-line/40">
                         <div>
-                          {ats && (
+                          {ats && atsColor && (
                             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${atsColor.bg} ${atsColor.text}`}>
                               ATS {ats.atsScore}%
                             </span>
@@ -742,7 +743,7 @@ const Dashboard: React.FC = () => {
                       </div>
                       
                       <div className="flex items-center gap-2.5 shrink-0">
-                        {ats && (
+                        {ats && atsColor && (
                           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${atsColor.bg} ${atsColor.text}`}>
                             {ats.atsScore}%
                           </span>
@@ -889,7 +890,7 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               </label>
-              <input type="file" id="resume-input" accept=".pdf" hidden onChange={(e) => setResume(e.target.files[0])} />
+              <input type="file" id="resume-input" accept=".pdf" hidden onChange={(e) => setResume(e.target.files?.[0] ?? null)} />
               <button type="submit" disabled={isLoading || !resume} className="btn-primary mt-2 w-full disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-emerald-500/35 outline-none">
                 {isLoading ? "Processing..." : "Upload & Continue"}
               </button>

@@ -1,5 +1,6 @@
 "use client";
 import type { PersonalInfoFormProps } from "./formTypes";
+import type { PersonalInfo } from "../templates/templateTypes";
 import {
   BriefcaseBusiness,
   Globe,
@@ -30,7 +31,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
   const { upload, uploading, error: uploadError } = useImageUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: keyof PersonalInfo, value: string) => {
     onChange({ ...data, [field]: value });
   };
 
@@ -44,7 +45,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
         removeBg: false,
       });
       onChange({ ...data, image: cdnUrl });
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err?.message || "Photo upload failed. It will still be saved with your resume.");
     }
   };
@@ -55,7 +56,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
 
   const inp = "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow";
 
-  const fields = [
+  const fields: { key: Exclude<keyof PersonalInfo, "image">; label: string; icon: any; type: string; required: boolean; col: number }[] = [
     { key: "full_name",  label: "Full Name",    icon: User,             type: "text",  required: true, col: 1 },
     { key: "profession", label: "Profession",   icon: BriefcaseBusiness,type: "text",  required: false, col: 1 },
     { key: "email",      label: "Email Address", icon: Mail,            type: "email", required: true, col: 1 },
@@ -103,7 +104,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
             type="file"
             accept="image/jpeg, image/png"
             className="hidden"
-            onChange={(e) => handleImageSelect(e.target.files[0])}
+            onChange={(e) => { const file = e.target.files?.[0]; if (file) handleImageSelect(file); }}
           />
         </label>
 

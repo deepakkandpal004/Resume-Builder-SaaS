@@ -23,7 +23,7 @@ interface AutoTextareaProps {
 }
 
 const AutoTextarea: React.FC<AutoTextareaProps> = ({ value, onChange, placeholder }) => {
-  const ref = useRef(null);
+  const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (ref.current) {
       ref.current.style.height = "auto";
@@ -56,7 +56,7 @@ const SectionManager: React.FC<SectionManagerProps> = ({
     return init;
   });
 
-  const [expanded, setExpanded] = useState({});
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const handleHeadingChange = (key: string, value: string) => {
     setLocalHeadings((prev) => ({ ...prev, [key]: value }));
@@ -197,7 +197,7 @@ const SectionManager: React.FC<SectionManagerProps> = ({
                         <label className="block text-xs font-medium text-body mb-1">Section Heading</label>
                         <input
                           type="text"
-                          value={section.heading}
+                          value={section.heading || ""}
                           maxLength={100}
                           onChange={(e) => updateSection(section.id, "heading", e.target.value)}
                           className={inp}
@@ -207,7 +207,7 @@ const SectionManager: React.FC<SectionManagerProps> = ({
                       <div>
                         <label className="block text-xs font-medium text-body mb-1">Content</label>
                         <AutoTextarea
-                          value={section.content}
+                          value={section.content || ""}
                           onChange={(e) => updateSection(section.id, "content", e.target.value)}
                           placeholder="Describe this section..."
                         />

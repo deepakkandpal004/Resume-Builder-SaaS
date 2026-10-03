@@ -148,7 +148,11 @@ const SectionCard: React.FC<{ title: string; children: React.ReactNode }> = ({ t
   </div>
 );
 
-const SelectGroup = ({ options, value, onChange }) => (
+const SelectGroup = ({ options, value, onChange }: {
+  options: { value: string | number; label: string }[];
+  value: string | number | boolean;
+  onChange: (v: string | number) => void;
+}) => (
   <div className="flex gap-2">
     {options.map((opt) => (
       <button
@@ -186,8 +190,8 @@ const StylesPanel: React.FC<StylesPanelProps> = ({ styleOptions, onChange, resum
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     if (!over || active.id === over.id) return;
-    const oldIndex = itemIds.indexOf(active.id);
-    const newIndex = itemIds.indexOf(over.id);
+    const oldIndex = itemIds.indexOf(String(active.id));
+    const newIndex = itemIds.indexOf(String(over.id));
     if (oldIndex === -1 || newIndex === -1) return;
     onChange({ ...styleOptions, sectionOrder: arrayMove(itemIds, oldIndex, newIndex) });
   };
@@ -338,9 +342,11 @@ const StylesPanel: React.FC<StylesPanelProps> = ({ styleOptions, onChange, resum
             <div className="grid grid-cols-2 gap-1.5">
               {PHOTO_EFFECT_OPTIONS.map((opt) => {
                 const isActive = photoEffect === opt.value;
+                const rawImage = resumeData.personal_info?.image;
+                const imageUrl = typeof rawImage === "string" ? rawImage : "";
                 const previewUrl = opt.value === "none"
-                  ? resumeData.personal_info.image
-                  : applyPhotoEffect(resumeData.personal_info.image, opt.value);
+                  ? imageUrl
+                  : applyPhotoEffect(imageUrl, opt.value);
                 return (
                   <button
                     key={opt.value}
@@ -356,7 +362,7 @@ const StylesPanel: React.FC<StylesPanelProps> = ({ styleOptions, onChange, resum
                       src={previewUrl}
                       alt={opt.label}
                       className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-line"
-                      onError={(e) => { e.target.style.display = "none"; }}
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
                     />
                     <div>
                       <p className="font-medium text-xs leading-tight">{opt.label}</p>

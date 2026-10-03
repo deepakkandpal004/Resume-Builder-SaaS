@@ -1,5 +1,6 @@
 "use client";
 import type { ProjectFormProps } from "./formTypes";
+import type { ProjectItem } from "../templates/templateTypes";
 import { Code2, Plus, Trash2, ChevronDown, ChevronUp, Github, Globe, Sparkles, Loader2, X } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -8,7 +9,7 @@ import api from "@/lib/config/apiClient";
 
 const inp = "premium-input";
 
-const TechTag = ({ value, onRemove }) => (
+const TechTag = ({ value, onRemove }: { value: string; onRemove: () => void }) => (
   <span className="premium-pill">
     <span>{value}</span>
     <button onClick={onRemove} className="rounded-full p-0.5 hover:bg-brand-200 dark:hover:bg-brand-500/30 transition-colors cursor-pointer">
@@ -69,9 +70,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, onChange }) => {
     onChange(updated);
   };
 
-  const updatedProject = (index: number, field: string, value: string) => {
+  const updatedProject = (index: number, field: string, value: string | string[]) => {
     const updated = [...data];
-    updated[index] = { ...updated[index], [field]: value };
+    updated[index] = { ...updated[index], [field]: value } as ProjectItem;
     onChange(updated);
   };
 
@@ -128,14 +129,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ data, onChange }) => {
       );
       updatedProject(index, "description", result.enhancedContent || project.description);
       toast.success("Description updated with AI!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message);
     } finally {
       setGeneratingIndex(-1);
     }
   };
 
-  const toggleExpand = (index) => {
+  const toggleExpand = (index: number) => {
     setExpanded((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 

@@ -39,7 +39,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({ data, onChange })
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Entry enhanced!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message);
     } finally {
       setGeneratingIndex(-1);

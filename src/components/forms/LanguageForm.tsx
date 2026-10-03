@@ -15,7 +15,7 @@ export const PROFICIENCY_LEVELS = [
   "Native / Bilingual",
 ];
 
-const LEVEL_DOTS = {
+const LEVEL_DOTS: Record<string, number> = {
   "Elementary":         1,
   "Conversational":     2,
   "Professional":       3,
@@ -50,7 +50,7 @@ const LanguageForm: React.FC<LanguageFormProps> = ({ data, onChange }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Entry enhanced!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message);
     } finally {
       setGeneratingIndex(-1);
@@ -115,7 +115,7 @@ const LanguageForm: React.FC<LanguageFormProps> = ({ data, onChange }) => {
                   <span
                     key={dot}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      dot <= (LEVEL_DOTS[lang.proficiency] ?? 2)
+                      dot <= (LEVEL_DOTS[lang.proficiency ?? ""] ?? 2)
                         ? "bg-brand-500"
                         : "bg-line"
                     }`}

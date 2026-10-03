@@ -18,17 +18,23 @@ import {
 } from "lucide-react";
 import api from "@/lib/config/apiClient";
 
+interface StatusHistoryEntry {
+  status: string;
+  at?: string;
+}
+
 interface ApplicationItem {
   _id: string;
   company: string;
   role: string;
   source: string;
   jobUrl?: string;
-  resumeId?: { _id: string } | string | null;
+  resumeId?: { _id: string; title?: string } | string | null;
   appliedAt?: string;
   notes?: string;
   status: string;
   atsScoreAtApply?: number | null;
+  statusHistory?: StatusHistoryEntry[];
 }
 
 interface ResumeRef {
@@ -481,7 +487,7 @@ const Applications: React.FC = () => {
         ) : (
           filtered.map((app) => {
             const expanded = expandedId === app._id;
-            const resumeTitle = app.resumeId?.title;
+            const resumeTitle = typeof app.resumeId === "object" && app.resumeId ? app.resumeId.title : undefined;
             return (
               <div
                 key={app._id}
@@ -515,7 +521,7 @@ const Applications: React.FC = () => {
                           <span
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/app/builder/${app.resumeId?._id || app.resumeId}`);
+                              router.push(`/app/builder/${typeof app.resumeId === "object" && app.resumeId ? app.resumeId._id : app.resumeId}`);
                             }}
                             className="cursor-pointer text-[11px] font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
                             title="Open this resume in the builder"
@@ -575,7 +581,7 @@ const Applications: React.FC = () => {
                         <ExternalLink className="size-3.5" /> View job posting
                       </a>
                     )}
-                    {app.statusHistory?.length > 0 && (
+                    {app.statusHistory && app.statusHistory.length > 0 && (
                       <div className="mt-3 flex flex-wrap items-center gap-1.5">
                         {app.statusHistory.map((h, i) => (
                           <span key={i} className="flex items-center gap-1.5">

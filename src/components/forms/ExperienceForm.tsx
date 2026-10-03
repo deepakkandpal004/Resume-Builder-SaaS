@@ -1,5 +1,6 @@
 "use client";
 import type { ExperienceFormProps } from "./formTypes";
+import type { ExperienceItem } from "../templates/templateTypes";
 import { Briefcase, Loader2, Plus, Sparkles, Trash2, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -87,9 +88,9 @@ const ExperienceForm: React.FC<ExperienceFormProps> = ({ data, onChange }) => {
     onChange(updated);
   };
 
-  const updatedExperience = (index: number, field: string, value: string) => {
+  const updatedExperience = (index: number, field: string, value: string | boolean) => {
     const updated = [...data];
-    updated[index] = { ...updated[index], [field]: value };
+    updated[index] = { ...updated[index], [field]: value } as ExperienceItem;
     onChange(updated);
   };
 
@@ -150,7 +151,7 @@ const ExperienceForm: React.FC<ExperienceFormProps> = ({ data, onChange }) => {
       
       updatedExperience(index, "description", result.rewrittenText || experience.description);
       toast.success("Bullets updated with AI!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message);
     } finally {
       setGeneratingIndex(-1);

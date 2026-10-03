@@ -9,7 +9,7 @@ const inp = "premium-input";
 
 const SkillsForm: React.FC<SkillsFormProps> = ({ data, onChange, profession }) => {
   const [newSkill, setNewSkill] = React.useState("");
-  const [suggestions, setSuggestions] = React.useState(null);
+  const [suggestions, setSuggestions] = React.useState<{ technical: string[]; soft: string[]; tools: string[] } | null>(null);
   const [loading, setLoading] = React.useState(false);
 
   const addSkill = () => {
@@ -43,7 +43,7 @@ const SkillsForm: React.FC<SkillsFormProps> = ({ data, onChange, profession }) =
         { targetRole: profession, currentSkills: data }
       );
       setSuggestions(result.suggestedSkills);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response?.data?.quotaExhausted) {
         toast.error(error.response.data.message);
       } else {

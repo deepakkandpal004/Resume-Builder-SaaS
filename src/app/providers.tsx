@@ -8,7 +8,7 @@ import { makeStore } from "@/lib/store/store";
 import { setUser, setLoading, logout } from "@/lib/store/features/authSlice";
 import { setCachedToken } from "@/lib/config/apiClient";
 import api from "@/lib/config/apiClient";
-import Loader from "@/components/Loader";
+import Loader from "@/components/ui/Loader";
 
 function AuthListener({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();

@@ -62,7 +62,7 @@ export interface PersonalInfoFormProps {
   data: PersonalInfo;
   onChange: (data: PersonalInfo) => void;
   removeBackground: boolean;
-  setRemoveBackground: (value: boolean) => void;
+  setRemoveBackground: React.Dispatch<React.SetStateAction<boolean>>;
   resumeId: string;
 }
 

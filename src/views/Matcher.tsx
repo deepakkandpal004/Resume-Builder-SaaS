@@ -32,8 +32,8 @@ interface MatchRanking {
   title: string;
   score: number;
   reason?: string;
-  matchedSkills?: string[];
-  missingSkills?: string[];
+  matchedSkills: string[];
+  missingSkills: string[];
 }
 
 interface MatchResult {
