@@ -38,6 +38,18 @@ An AI-powered resume builder and job-application companion. Build ATS-friendly r
 
 - Firebase Authentication (Google + email), server-verified ID tokens
 - Daily usage quotas per AI feature for free tier; premium tier via Razorpay
+
+## Architecture
+
+CareerForge follows a practical **layered architecture** (Next.js monolith):
+
+1. **Presentation** — `src/app` (App Router pages), `src/old-pages` (large screens), `src/components`
+2. **Controller / transport** — `src/app/api/**/route.ts`. Thin handlers: connect DB → `protect()` auth → `checkQuota()` → parse request → call a service → map `ServiceError` to HTTP responses. No business logic lives here.
+3. **Service / business logic** — `src/lib/services/`. Each domain owns its module (`resumeService`, `applicationService`, `userService`, `paymentService`, `atsService`, `matcherService`, `tailorService`, `enhanceService`, `scoreService`, `interviewService`, `coverLetterService`) plus shared plumbing: `aiService` (Groq model selection, JSON extraction, provider-error mapping) and `errors` (`ServiceError` with HTTP status).
+4. **Data access** — Mongoose models in `src/lib/models`.
+5. **Cross-cutting** — `src/lib/middlewares` (auth, quota), `src/lib/config` (db, ai, imageKit, firebase, mailer), `src/lib/observability` (logger), `src/lib/validators`, `src/lib/utils`.
+
+Rules of thumb: routes never touch the database or the AI directly; services throw `ServiceError` and never build HTTP responses; input that must not burn quota is validated in the route **before** `checkQuota()`.
 - Dark mode, responsive UI
 
 ---

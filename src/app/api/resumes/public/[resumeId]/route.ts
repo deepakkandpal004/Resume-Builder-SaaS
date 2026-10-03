@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/config/db";
-import Resume from "@/lib/models/Resume";
-import mongoose from "mongoose";
+import { getPublicResume } from "@/lib/services/resumeService";
+import { ServiceError } from "@/lib/services/errors";
 import logger from "@/lib/observability/logger";
 
 export async function GET(
@@ -12,16 +12,13 @@ export async function GET(
     await connectDB();
 
     const { resumeId } = await params;
-    if (!mongoose.isValidObjectId(resumeId)) {
-      return NextResponse.json({ message: "Invalid resume id" }, { status: 400 });
-    }
-
-    const resume = await Resume.findOne({ public: true, _id: resumeId });
-    if (!resume) return NextResponse.json({ message: "Resume not found" }, { status: 404 });
-
+    const resume = await getPublicResume(resumeId);
     return NextResponse.json(resume);
   } catch (error: any) {
     logger.error("getPublicResumeById failed:", error.message);
+    if (error instanceof ServiceError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
   }
 }

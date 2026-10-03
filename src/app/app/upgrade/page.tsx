@@ -2,8 +2,8 @@
 
 import dynamic from "next/dynamic";
 
-const Layout = dynamic(() => import("@/old-pages/Layout"), { ssr: false });
-const Upgrade = dynamic(() => import("@/old-pages/Upgrade"), { ssr: false });
+const Layout = dynamic(() => import("@/views/Layout"), { ssr: false });
+const Upgrade = dynamic(() => import("@/views/Upgrade"), { ssr: false });
 
 export default function AppUpgradePage() {
   return <Layout><Upgrade /></Layout>;

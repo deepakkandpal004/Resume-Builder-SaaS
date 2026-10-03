@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/config/db";
 import { protect } from "@/lib/middlewares/auth";
-import Resume from "@/lib/models/Resume";
-import { getMongoUserId } from "@/lib/utils/userHelper";
-import mongoose from "mongoose";
+import { toggleShare } from "@/lib/services/resumeService";
+import { ServiceError } from "@/lib/services/errors";
 
 // Toggle public link sharing for one of the user's own resumes.
 // When `share` is true, the resume becomes viewable at /view/[resumeId]
@@ -15,34 +14,13 @@ export async function POST(request: NextRequest) {
     const authResult = await protect(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const userId = await getMongoUserId(authResult.userId);
-    if (!userId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
     const { resumeId, share } = await request.json();
-    if (!mongoose.isValidObjectId(resumeId)) {
-      return NextResponse.json({ message: "Invalid resume id" }, { status: 400 });
-    }
-    if (typeof share !== "boolean") {
-      return NextResponse.json({ message: "Invalid share flag" }, { status: 400 });
-    }
-
-    const resume = await Resume.findOneAndUpdate(
-      { _id: resumeId, userId },
-      { public: share },
-      { new: true }
-    ).select("_id public");
-
-    if (!resume) {
-      return NextResponse.json({ message: "Resume not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      resumeId: String(resume._id),
-      public: resume.public,
-    });
+    const result = await toggleShare(authResult.userId, { resumeId, share });
+    return NextResponse.json(result);
   } catch (error: any) {
+    if (error instanceof ServiceError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
   }
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/config/db";
 import { protect } from "@/lib/middlewares/auth";
-import User from "@/lib/models/User";
+import { getUserData } from "@/lib/services/userService";
+import { ServiceError } from "@/lib/services/errors";
 import logger from "@/lib/observability/logger";
 
 export async function GET(request: NextRequest) {
@@ -10,14 +11,13 @@ export async function GET(request: NextRequest) {
     const authResult = await protect(request);
     if (authResult instanceof NextResponse) return authResult;
 
-    const firebaseUid = authResult.userId;
-    const user = await User.findOne({ firebaseUid });
-    if (!user) {
-      return NextResponse.json({ message: "user not found" }, { status: 404 });
-    }
-    return NextResponse.json({ user });
+    const result = await getUserData(authResult.userId);
+    return NextResponse.json(result);
   } catch (error: any) {
     logger.error("getUserId failed:", error.message);
+    if (error instanceof ServiceError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
   }
 }

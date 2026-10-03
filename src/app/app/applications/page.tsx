@@ -2,8 +2,8 @@
 
 import dynamic from "next/dynamic";
 
-const Layout = dynamic(() => import("@/old-pages/Layout"), { ssr: false });
-const Applications = dynamic(() => import("@/old-pages/Applications"), {
+const Layout = dynamic(() => import("@/views/Layout"), { ssr: false });
+const Applications = dynamic(() => import("@/views/Applications"), {
   ssr: false,
 });
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/config/db";
 import { protect } from "@/lib/middlewares/auth";
-import User from "@/lib/models/User";
+import { syncUser } from "@/lib/services/userService";
+import { ServiceError } from "@/lib/services/errors";
 import logger from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
@@ -13,68 +14,19 @@ export async function POST(request: NextRequest) {
     if (authResult instanceof NextResponse) return authResult;
 
     const body = await request.json().catch(() => ({}));
-    const firebaseUid = authResult.userId;
-    const tokenEmail =
-      authResult.firebaseUser?.email?.trim().toLowerCase() || "";
-    const name = body.name || authResult.firebaseUser?.name || authResult.firebaseUser?.displayName;
-    const emailVerified =
-      authResult.firebaseUser?.email_verified === true;
-
-    console.log("[API /api/users/sync] Syncing user:", { firebaseUid, tokenEmail, name, emailVerified });
-
-    console.log("[USER SYNC] Firebase identity:", {
-      firebaseUid,
-      tokenEmail,
+    const result = await syncUser({
+      firebaseUid: authResult.userId,
+      name: body.name,
+      tokenEmail: authResult.firebaseUser?.email?.trim().toLowerCase() || "",
+      tokenName: authResult.firebaseUser?.name || authResult.firebaseUser?.displayName,
+      emailVerified: authResult.firebaseUser?.email_verified === true,
     });
-
-
-    let user = await User.findOne({ firebaseUid });
-
-    console.log("[USER SYNC] User found by UID:", {
-      found: !!user,
-      userId: user?._id?.toString(),
-      email: user?.email,
-      firebaseUid: user?.firebaseUid,
-    });
-
-
-    if (user) {
-      user.name = name || user.name;
-      if (tokenEmail) user.email = tokenEmail;
-      user.emailVerified = user.emailVerified || emailVerified;
-      await user.save();
-      console.log("[API /api/users/sync] Updated existing user in MongoDB:", user._id);
-    } else {
-      user = tokenEmail ? await User.findOne({ email: tokenEmail }) : null;
-
-      console.log("[USER SYNC] User found by email:", {
-          found: !!user,
-          userId: user?._id?.toString(),
-          email: user?.email,
-          firebaseUid: user?.firebaseUid,
-        });
-
-      if (user) {
-        user.firebaseUid = firebaseUid;
-        user.name = name || user.name;
-        user.emailVerified = user.emailVerified || emailVerified;
-        await user.save();
-        console.log("[API /api/users/sync] Linked existing MongoDB account by email:", user._id);
-      } else {
-        user = await User.create({
-          firebaseUid,
-          name: name || tokenEmail?.split("@")[0] || "User",
-          email: tokenEmail || `${firebaseUid}@anonymous.user`,
-          emailVerified,
-        });
-        console.log("[API /api/users/sync] Created brand new user in MongoDB:", user._id);
-      }
-    }
-
-    return NextResponse.json({ user });
+    return NextResponse.json(result);
   } catch (error: any) {
-    console.error("[API /api/users/sync Error]:", error);
     logger.error("syncUser failed: " + (error?.message || error));
+    if (error instanceof ServiceError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
     return NextResponse.json(
       {
         message: "Something went wrong syncing user profile",

@@ -172,3 +172,218 @@ export function checkKeywordMatch(keyword: string, normalizedResumeText: string)
   if (normalizedKeyword.length === 0) return false;
   return normalizedResumeText.includes(normalizedKeyword);
 }
+
+// ---------------------------------------------------------------------------
+// Layered architecture — full ATS scan workflow (extracted from the route).
+// ---------------------------------------------------------------------------
+import mongoose from "mongoose";
+import Resume from "@/lib/models/Resume";
+import AtsScore from "@/lib/models/AtsScore";
+import User from "@/lib/models/User";
+import getAI from "@/lib/config/ai";
+import { getMongoUserId } from "@/lib/utils/userHelper";
+import logger from "@/lib/observability/logger";
+import { ServiceError } from "./errors";
+
+const ATS_GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+
+export interface AtsScanResult {
+  atsScore: number;
+  scanId: unknown;
+  scansRemainingToday: number | null;
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  skillsGap: { skill: string; priority: string; category: string }[];
+  suggestions: { text: string; scoreImpact: number; section: string }[];
+}
+
+export async function runAtsScan(
+  firebaseUserId: string,
+  input: { resumeId: unknown; jobDescription: unknown }
+): Promise<AtsScanResult> {
+  const { resumeId, jobDescription } = input;
+
+  if (!resumeId || !jobDescription) {
+    throw new ServiceError("resumeId and jobDescription are required.", 400);
+  }
+  if (!mongoose.Types.ObjectId.isValid(resumeId as string)) {
+    throw new ServiceError("Invalid resume ID.", 400);
+  }
+  if (
+    typeof jobDescription !== "string" ||
+    jobDescription.length < 50 ||
+    jobDescription.length > 10000
+  ) {
+    throw new ServiceError("jobDescription must be between 50 and 10,000 characters.", 400);
+  }
+
+  let resume: any;
+  try {
+    resume = await Resume.findById(resumeId);
+  } catch {
+    throw new ServiceError("Database unavailable. Please try again.", 503);
+  }
+  if (!resume) throw new ServiceError("Resume not found.", 404);
+
+  const mongoUserId = await getMongoUserId(firebaseUserId);
+  if (resume.userId.toString() !== mongoUserId?.toString()) {
+    throw new ServiceError("Access denied.", 403);
+  }
+
+  const normalizedResumeText = normalizeText(buildResumeText(resume));
+  if (normalizedResumeText.trim().length === 0) {
+    throw new ServiceError(
+      "Resume has no content to analyze. Please add content to your resume before running an ATS scan.",
+      422
+    );
+  }
+
+  const messages = buildAtsPrompt(normalizedResumeText, jobDescription as string);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+  let aiResponse: any;
+  try {
+    aiResponse = await getAI().chat.completions.create(
+      {
+        model: ATS_GROQ_MODEL,
+        messages,
+        // NOTE: gpt-oss models on Groq reject response_format json_object with 400.
+        // The system prompt already enforces JSON-only output and parseAtsResponse strips fences.
+        // reasoning_effort "low" stops the model from burning its token budget on
+        // chain-of-thought (previously returned empty content with finish_reason "length").
+        reasoning_effort: "low",
+        max_completion_tokens: 4096,
+      } as any,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError" || err.code === "ABORT_ERR" || err.message?.includes("abort")) {
+      throw new ServiceError("Analysis timed out. Please try again.", 504);
+    }
+    logger.error({ status: err?.status, message: err?.message }, "ATS AI call failed");
+    throw new ServiceError("AI scoring service is temporarily unavailable. Please try again.", 503);
+  }
+
+  const rawContent = aiResponse.choices[0]?.message?.content || "";
+  let parsed: ReturnType<typeof parseAtsResponse>;
+  try {
+    parsed = parseAtsResponse(rawContent);
+  } catch (err: any) {
+    if (err instanceof AtsParseError) {
+      const dbgMsg: any = aiResponse?.choices?.[0]?.message || {};
+      logger.error(
+        {
+          contentPreview: String(rawContent).slice(0, 500),
+          finishReason: aiResponse?.choices?.[0]?.finish_reason,
+          hasReasoningContent: Boolean(dbgMsg.reasoning_content),
+          reasoningPreview: String(dbgMsg.reasoning_content || "").slice(0, 500),
+        },
+        "ATS parse error"
+      );
+      if (err.message.includes("Invalid score")) {
+        throw new ServiceError("AI returned an invalid score. Please try again.", 500);
+      }
+      throw new ServiceError("Failed to process AI analysis. Please try again.", 500);
+    }
+    throw new ServiceError("Failed to process AI analysis. Please try again.", 500);
+  }
+
+  const existingCount = await AtsScore.countDocuments({ resumeId });
+  if (existingCount >= 10) {
+    const oldest = await AtsScore.findOne({ resumeId }).sort({ createdAt: 1 });
+    if (oldest) {
+      try {
+        await AtsScore.deleteOne({ _id: oldest._id });
+      } catch {
+        throw new ServiceError("Failed to save scan results. Please try again.", 500);
+      }
+    }
+  }
+
+  const newScan = new AtsScore({
+    userId: mongoUserId,
+    resumeId,
+    jdSnippet: (jobDescription as string).slice(0, 500),
+    atsScore: parsed.atsScore,
+    matchedKeywords: parsed.matchedKeywords,
+    missingKeywords: parsed.missingKeywords,
+    skillsGap: parsed.skillsGap,
+    suggestions: parsed.suggestions,
+  });
+
+  try {
+    await newScan.save();
+  } catch {
+    throw new ServiceError("Failed to save scan results. Please try again.", 500);
+  }
+
+  let scansRemainingToday: number | null = null;
+  try {
+    const user = await User.findById(mongoUserId).select("subscriptionTier");
+    if (!user || user.subscriptionTier !== "premium") {
+      const utcDayStart = new Date();
+      utcDayStart.setUTCHours(0, 0, 0, 0);
+      const todayCount = await AtsScore.countDocuments({
+        userId: mongoUserId,
+        createdAt: { $gte: utcDayStart },
+      });
+      scansRemainingToday = Math.max(0, 1 - todayCount);
+    }
+  } catch {
+    scansRemainingToday = null;
+  }
+
+  return {
+    atsScore: parsed.atsScore,
+    scanId: newScan._id,
+    scansRemainingToday,
+    matchedKeywords: parsed.matchedKeywords,
+    missingKeywords: parsed.missingKeywords,
+    skillsGap: parsed.skillsGap,
+    suggestions: parsed.suggestions,
+  };
+}
+
+/**
+ * List the last 10 ATS scans for a resume (history view).
+ */
+export async function getAtsScanHistory(
+  firebaseUserId: string,
+  resumeId: string
+): Promise<{ scans: any[] }> {
+  if (!mongoose.Types.ObjectId.isValid(resumeId)) {
+    throw new ServiceError("Invalid resume ID.", 400);
+  }
+
+  let resume: any;
+  try {
+    resume = await Resume.findById(resumeId);
+  } catch {
+    throw new ServiceError("Database unavailable. Please try again.", 503);
+  }
+  if (!resume) throw new ServiceError("Resume not found.", 404);
+
+  const mongoUserId = await getMongoUserId(firebaseUserId);
+  if (resume.userId.toString() !== mongoUserId?.toString()) {
+    throw new ServiceError("Access denied.", 403);
+  }
+
+  const scans = await AtsScore.find({ resumeId }).sort({ createdAt: -1 }).limit(10);
+
+  return {
+    scans: scans.map((doc: any) => ({
+      scanId: doc._id,
+      atsScore: doc.atsScore,
+      jdSnippet: doc.jdSnippet,
+      matchedKeywords: doc.matchedKeywords,
+      missingKeywords: doc.missingKeywords,
+      skillsGap: doc.skillsGap,
+      suggestions: doc.suggestions,
+      createdAt: doc.createdAt,
+    })),
+  };
+}
