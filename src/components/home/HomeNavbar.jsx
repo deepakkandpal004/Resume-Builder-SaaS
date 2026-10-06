@@ -38,13 +38,43 @@ const HomeNavbar = () => {
         signOut(auth);
         router.push("/");
     };
-    /* ── Smooth anchor scroll (respects scroll-mt on sections) ── */
+    /* ── Cinematic anchor scroll: custom duration + easing ── */
+    const smoothScrollTo = (target) => {
+        const startY = window.scrollY;
+        const targetY = typeof target === "number"
+            ? target
+            : target.getBoundingClientRect().top + startY - (parseFloat(getComputedStyle(target).scrollMarginTop) || 0);
+        const distance = targetY - startY;
+        if (Math.abs(distance) < 2)
+            return;
+        const duration = Math.min(1200, 500 + Math.abs(distance) * 0.35);
+        let raf = 0;
+        let startTime = 0;
+        const stopUserScroll = () => cancelAnimationFrame(raf);
+        const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        const step = (now) => {
+            if (!startTime)
+                startTime = now;
+            const p = Math.min((now - startTime) / duration, 1);
+            window.scrollTo({ top: startY + distance * easeInOutCubic(p), behavior: "instant" });
+            if (p < 1) {
+                raf = requestAnimationFrame(step);
+            }
+            else {
+                window.removeEventListener("wheel", stopUserScroll);
+                window.removeEventListener("touchmove", stopUserScroll);
+            }
+        };
+        window.addEventListener("wheel", stopUserScroll, { passive: true });
+        window.addEventListener("touchmove", stopUserScroll, { passive: true });
+        raf = requestAnimationFrame(step);
+    };
     const handleNavClick = (e, href) => {
         e.preventDefault();
         setMenuOpen(false);
         const el = document.querySelector(href);
         if (el)
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            smoothScrollTo(el);
     };
     /* ── Scroll effect tracker ── */
     useEffect(() => {
@@ -98,9 +128,9 @@ const HomeNavbar = () => {
             : "h-20 bg-transparent border-b border-transparent"}`}>
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
         {/* Logo */}
-        <Link href="/" className="relative z-10 shrink-0 hover:opacity-90 transition-opacity" aria-label="ResumeAI home">
+        <button onClick={() => smoothScrollTo(0)} className="relative z-10 shrink-0 hover:opacity-90 transition-opacity cursor-pointer" aria-label="Back to top">
           <Logo size="md"/>
-        </Link>
+        </button>
 
         {/* Desktop nav links with active-section indicator */}
         <div className="hidden items-center gap-1 md:flex relative">
@@ -184,12 +214,12 @@ const HomeNavbar = () => {
           <X size={19}/>
         </button>
 
-        <Link href="/" onClick={() => setMenuOpen(false)} className="mb-2">
+        <button onClick={() => { setMenuOpen(false); smoothScrollTo(0); }} className="mb-2 cursor-pointer" aria-label="Back to top">
           <Logo size="md"/>
-        </Link>
+        </button>
 
         <div className="flex w-full flex-col items-center gap-1 px-8">
-          {NAV_LINKS.map((l, i) => (<a key={l.label} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className="w-full rounded-xl px-6 py-3.5 text-center font-medium text-body transition-colors hover:bg-ink/5 hover:text-ink animate-drawer-item motion-reduce:animate-none" style={{ fontFamily: "'Sora', sans-serif", fontSize: "1.1rem", letterSpacing: "-0.01em", animationDelay: `${i * 70}ms` }}>
+          {NAV_LINKS.map((l, i) => (<a key={l.label} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className="w-full rounded-xl px-6 py-3.5 text-center font-medium text-body transition-colors hover:bg-ink/5 hover:text-ink animate-drawer-item motion-reduce:animate-none" style={{ fontFamily: "'Mulish', sans-serif", fontSize: "1.1rem", letterSpacing: "-0.01em", animationDelay: `${i * 70}ms` }}>
               {l.label}
             </a>))}
         </div>
@@ -209,7 +239,7 @@ const HomeNavbar = () => {
               <Link href="/app?state=register" onClick={() => setMenuOpen(false)} className="flex w-full max-w-xs items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3.5 text-sm font-bold transition-colors">
                 Start free <ArrowRight className="size-4"/>
               </Link>
-              <Link href="/app?state=login" onClick={() => setMenuOpen(false)} className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-colors hover:text-ink" style={{ fontFamily: "'Sora', sans-serif" }}>
+              <Link href="/app?state=login" onClick={() => setMenuOpen(false)} className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-colors hover:text-ink" style={{ fontFamily: "'Mulish', sans-serif" }}>
                 Login
               </Link>
             </>)}

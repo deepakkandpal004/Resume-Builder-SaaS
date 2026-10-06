@@ -81,9 +81,19 @@ body {
 
 /* ── Landing page display font (scoped — the app keeps its own) ── */
 .landing-page :is(h1, h2, h3, h4):not(#resume-preview *):not(.resume-preview *) {
-  font-family: var(--font-landing-display), "Sora", "Inter", sans-serif;
+  font-family: var(--font-landing-display), "Mulish", "Inter", sans-serif;
   letter-spacing: -0.02em;
   font-weight: 700;
+}
+
+/* ── Landing page body font (whole landing) ──────────────────────
+   Overrides the --font-sans variable inside .landing-page, so every
+   element using it (via the global rule) renders Nunito here. ── */
+.landing-page {
+  --font-sans: var(--font-landing-body), "Nunito", "Inter", sans-serif;
+}
+.landing-page .font-display {
+  font-family: var(--font-landing-display), "Mulish", sans-serif;
 }
 
 /* ── Nav-specific glass — theme-synced variant (dashboard/home) ── */
@@ -109,7 +119,7 @@ body {
 
 /* ── Ghost CTA (Login) ────────────────────────────────────────── */
 .nav-cta-ghost {
-  font-family: 'Sora', ui-sans-serif, sans-serif;
+  font-family: 'Mulish', ui-sans-serif, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -126,7 +136,7 @@ body {
 .nav-pill-btn {
   display: inline-flex;
   align-items: center;
-  font-family: 'Sora', ui-sans-serif, sans-serif;
+  font-family: 'Mulish', ui-sans-serif, sans-serif;
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: -0.01em;
