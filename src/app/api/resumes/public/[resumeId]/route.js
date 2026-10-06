@@ -1,0 +1,20 @@
+import { NextResponse } from "next/server";
+import connectDB from "@/lib/config/db";
+import { getPublicResume } from "@/lib/services/resumeService";
+import { ServiceError } from "@/lib/services/errors";
+import logger from "@/lib/observability/logger";
+export async function GET(request, { params }) {
+    try {
+        await connectDB();
+        const { resumeId } = await params;
+        const resume = await getPublicResume(resumeId);
+        return NextResponse.json(resume);
+    }
+    catch (error) {
+        logger.error("getPublicResumeById failed:", error.message);
+        if (error instanceof ServiceError) {
+            return NextResponse.json({ message: error.message }, { status: error.status });
+        }
+        return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    }
+}
