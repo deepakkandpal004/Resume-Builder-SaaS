@@ -68,7 +68,7 @@ const plans = [
     },
 ];
 const Pricing = () => {
-    return (<section id="pricing" className="relative overflow-hidden px-6 py-24 md:px-10">
+    return (<section id="pricing" className="relative scroll-mt-24 overflow-hidden px-6 py-24 md:px-10">
       <div className="section-line absolute top-0 inset-x-0"/>
 
       <div className="mx-auto max-w-5xl">

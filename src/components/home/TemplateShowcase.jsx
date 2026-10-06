@@ -69,7 +69,7 @@ const templates = [
 const TemplateShowcase = () => {
     const data = dummyResumeData[0];
     const router = useRouter();
-    return (<section id="templates" className="relative overflow-hidden px-6 py-24 md:px-10">
+    return (<section id="templates" className="relative scroll-mt-24 overflow-hidden px-6 py-24 md:px-10">
       <div className="section-line absolute top-0 inset-x-0"/>
 
       <div className="mx-auto max-w-7xl">

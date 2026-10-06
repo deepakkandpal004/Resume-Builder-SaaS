@@ -1,4 +1,4 @@
-import { Inter, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, Sora } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 const inter = Inter({
@@ -12,11 +12,11 @@ const plusJakartaSans = Plus_Jakarta_Sans({
     display: "swap",
     weight: ["400", "500", "600", "700", "800"],
 });
-const spaceGrotesk = Space_Grotesk({
+const sora = Sora({
     subsets: ["latin"],
     variable: "--font-landing-display",
     display: "swap",
-    weight: ["400", "500", "600", "700"],
+    weight: ["400", "500", "600", "700", "800"],
 });
 export const metadata = {
     title: "ResumeAI — Match your resume to the job",
@@ -26,7 +26,7 @@ export const metadata = {
     },
 };
 export default function RootLayout({ children, }) {
-    return (<html lang="en" className={`${inter.variable} ${plusJakartaSans.variable} ${spaceGrotesk.variable}`}>
+    return (<html lang="en" className={`${inter.variable} ${plusJakartaSans.variable} ${sora.variable}`}>
       <head>
         {/* Dark mode removed (light-only app): strip any stale `dark` class
             before paint, e.g. from a previous session's DOM. */}

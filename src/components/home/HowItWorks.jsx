@@ -25,7 +25,7 @@ const steps = [
     },
 ];
 export default function HowItWorks() {
-    return (<section id="how-it-works" className="px-6 py-20 md:px-10 md:py-28">
+    return (<section id="how-it-works" className="scroll-mt-24 px-6 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">

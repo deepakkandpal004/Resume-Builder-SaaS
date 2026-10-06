@@ -38,6 +38,14 @@ const HomeNavbar = () => {
         signOut(auth);
         router.push("/");
     };
+    /* ── Smooth anchor scroll (respects scroll-mt on sections) ── */
+    const handleNavClick = (e, href) => {
+        e.preventDefault();
+        setMenuOpen(false);
+        const el = document.querySelector(href);
+        if (el)
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
     /* ── Scroll effect tracker ── */
     useEffect(() => {
         const handleScroll = () => {
@@ -48,7 +56,6 @@ const HomeNavbar = () => {
     }, []);
     /* ── IntersectionObserver for active section tracking ─────────── */
     useEffect(() => {
-        const sections = NAV_LINKS.map(link => document.querySelector(link.href)).filter(Boolean);
         const observerOptions = {
             root: null,
             rootMargin: "-25% 0px -55% 0px", // Trigger when section occupies the primary viewport space
@@ -61,9 +68,17 @@ const HomeNavbar = () => {
                 }
             });
         }, observerOptions);
-        sections.forEach((section) => observer.observe(section));
+        // Sections below the fold are lazy-loaded — re-query until all are observed.
+        const observeAll = () => {
+            NAV_LINKS.map(link => document.querySelector(link.href))
+                .filter(Boolean)
+                .forEach((section) => observer.observe(section));
+        };
+        observeAll();
+        const t = setTimeout(observeAll, 1500);
         return () => {
-            sections.forEach((section) => observer.unobserve(section));
+            clearTimeout(t);
+            observer.disconnect();
         };
     }, []);
     /* ── Escape key ── */
@@ -78,7 +93,7 @@ const HomeNavbar = () => {
         document.body.style.overflow = menuOpen ? "hidden" : "";
         return () => { document.body.style.overflow = ""; };
     }, [menuOpen]);
-    return (<nav className={`fixed inset-x-0 top-0 z-50 transition-colors flex items-center ${scrolled
+    return (<nav className={`fixed inset-x-0 top-0 z-50 transition-colors flex items-center animate-nav-drop motion-reduce:animate-none ${scrolled
             ? "h-16 bg-surface/75 backdrop-blur-[18px] border-b border-line/45 shadow-sm"
             : "h-20 bg-transparent border-b border-transparent"}`}>
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
@@ -91,7 +106,7 @@ const HomeNavbar = () => {
         <div className="hidden items-center gap-1 md:flex relative">
           {NAV_LINKS.map((l) => {
             const isActive = l.href === `#${activeSection}`;
-            return (<a key={l.label} href={l.href} className={`relative px-4 py-2 text-sm font-semibold tracking-tight transition-colors cursor-pointer ${isActive
+            return (<a key={l.label} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className={`relative px-4 py-2 text-sm font-semibold tracking-tight transition-colors cursor-pointer ${isActive
                     ? "text-brand-600 dark:text-brand-400"
                     : "text-body hover:text-brand-600 dark:hover:text-brand-400"}`}>
                 <span>{l.label}</span>
@@ -174,7 +189,7 @@ const HomeNavbar = () => {
         </Link>
 
         <div className="flex w-full flex-col items-center gap-1 px-8">
-          {NAV_LINKS.map((l) => (<a key={l.label} href={l.href} onClick={() => setMenuOpen(false)} className="w-full rounded-xl px-6 py-3.5 text-center font-medium text-body transition-colors hover:bg-ink/5 hover:text-ink" style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "1.1rem", letterSpacing: "-0.01em" }}>
+          {NAV_LINKS.map((l, i) => (<a key={l.label} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className="w-full rounded-xl px-6 py-3.5 text-center font-medium text-body transition-colors hover:bg-ink/5 hover:text-ink animate-drawer-item motion-reduce:animate-none" style={{ fontFamily: "'Sora', sans-serif", fontSize: "1.1rem", letterSpacing: "-0.01em", animationDelay: `${i * 70}ms` }}>
               {l.label}
             </a>))}
         </div>
@@ -194,7 +209,7 @@ const HomeNavbar = () => {
               <Link href="/app?state=register" onClick={() => setMenuOpen(false)} className="flex w-full max-w-xs items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3.5 text-sm font-bold transition-colors">
                 Start free <ArrowRight className="size-4"/>
               </Link>
-              <Link href="/app?state=login" onClick={() => setMenuOpen(false)} className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-colors hover:text-ink" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <Link href="/app?state=login" onClick={() => setMenuOpen(false)} className="w-full max-w-xs rounded-xl border border-line bg-surface py-3.5 text-center font-medium text-body transition-colors hover:text-ink" style={{ fontFamily: "'Sora', sans-serif" }}>
                 Login
               </Link>
             </>)}

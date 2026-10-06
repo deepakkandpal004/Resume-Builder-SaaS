@@ -81,7 +81,7 @@ body {
 
 /* ── Landing page display font (scoped — the app keeps its own) ── */
 .landing-page :is(h1, h2, h3, h4):not(#resume-preview *):not(.resume-preview *) {
-  font-family: var(--font-landing-display), "Space Grotesk", "Inter", sans-serif;
+  font-family: var(--font-landing-display), "Sora", "Inter", sans-serif;
   letter-spacing: -0.02em;
   font-weight: 700;
 }
@@ -109,7 +109,7 @@ body {
 
 /* ── Ghost CTA (Login) ────────────────────────────────────────── */
 .nav-cta-ghost {
-  font-family: 'Space Grotesk', ui-sans-serif, sans-serif;
+  font-family: 'Sora', ui-sans-serif, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -126,7 +126,7 @@ body {
 .nav-pill-btn {
   display: inline-flex;
   align-items: center;
-  font-family: 'Space Grotesk', ui-sans-serif, sans-serif;
+  font-family: 'Sora', ui-sans-serif, sans-serif;
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -356,6 +356,22 @@ body {
   transform: translateX(-160%) skewX(-20deg);
   animation: fx-shine-sweep 4s ease-in-out infinite;
   pointer-events: none;
+}
+
+/* Navbar: entrance drop on load + mobile drawer link stagger */
+@keyframes nav-drop-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.landing-page .animate-nav-drop {
+  animation: nav-drop-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes drawer-item-in {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.landing-page .animate-drawer-item {
+  animation: drawer-item-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

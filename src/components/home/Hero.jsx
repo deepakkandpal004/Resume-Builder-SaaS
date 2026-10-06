@@ -48,9 +48,10 @@ export default function Hero() {
 
       <div className="relative mx-auto max-w-7xl text-center">
         <Reveal>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-brand-600">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand-600/20 bg-brand-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-brand-700">
+            <span className="size-1.5 rounded-full bg-brand-500" />
             AI resume workspace
-          </p>
+          </span>
         </Reveal>
         <h1 className="mx-auto mt-5 max-w-6xl text-5xl font-bold leading-[1.08] tracking-tight text-ink md:text-7xl">
           <AnimatedWords words={lineA} baseDelay={150}/>
