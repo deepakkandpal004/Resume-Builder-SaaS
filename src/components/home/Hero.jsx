@@ -7,11 +7,10 @@ const lineB = ["then", "make", "it", "fit", "better"];
 /* Each word rises into place with a stagger — kinetic type entrance. */
 function AnimatedWords({ words, baseDelay = 0 }) {
     return (<>
-      {words.map((w, i) => (<span key={`${w}-${i}`} className="-mb-1 inline-block overflow-hidden pb-1 align-bottom">
+      {words.map((w, i) => (<span key={`${w}-${i}`} className={`-mb-1 inline-block overflow-hidden pb-1 align-bottom ${i < words.length - 1 ? "mr-[0.3em]" : ""}`}>
           <span className="word-rise inline-block will-change-transform" style={{ animationDelay: `${baseDelay + i * 70}ms` }}>
             {w}
           </span>
-          {i < words.length - 1 ? " " : ""}
         </span>))}
     </>);
 }
